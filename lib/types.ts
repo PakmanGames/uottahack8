@@ -1,63 +1,100 @@
 // lib/types.ts
 
-export type TicketType = "SCALE_DEPLOYMENT" | "RESTART_POD";
+// DO Component Categories
+export type ComponentCategory =
+  | "compute"
+  | "storage"
+  | "database"
+  | "networking"
+  | "other";
 
-export type Ticket = {
-  ticketId: string;
-  type: TicketType;
-  target: {
-    deployment?: string;
-    pod?: string;
-    replicas?: number;
-  };
+// Individual DO Component
+export type DOComponent = {
+  id: string;
+  type: string; // "droplet-basic", "postgres", "load-balancer"
+  name: string; // Display name
+  icon: string; // Emoji icon
+  category: ComponentCategory;
+  monthlyCost: number;
   description: string;
+  terraformResource: string; // "digitalocean_droplet"
+  terraformConfig: Record<string, unknown>; // Terraform-specific config
+};
+
+// Customer placing order
+export type Customer = {
+  id: string;
+  name: string;
+  logo: string;
+  color: string;
+  patience: number; // 1-5, affects timer
+  tipMultiplier: number;
+  personality: string;
+};
+
+// Component required in order (with quantity)
+export type OrderComponent = {
+  componentType: string;
+  quantity: number;
+};
+
+// Order ticket from customer
+export type Order = {
+  orderId: string;
+  customer: Customer;
+  scenario: string; // "Web Application Stack"
+  description: string; // Customer's request text
+  requiredComponents: OrderComponent[];
   timeLimitSec: number;
+  baseReward: number;
 };
 
-export type Action =
-  | { type: "SCALE_DEPLOYMENT"; deployment: string; replicas: number }
-  | { type: "RESTART_POD"; pod: string };
-
-export type Deployment = {
-  name: string;
-  replicas: number;
-  readyReplicas: number;
+// Placed component in build area
+export type PlacedComponent = {
+  instanceId: string; // Unique per placement
+  component: DOComponent;
 };
 
-export type Pod = {
-  name: string;
-  ready: boolean;
-  status: string;
-  owner: string; // deployment name
+// Player's current build
+export type BuildArea = {
+  placedComponents: PlacedComponent[];
 };
 
-export type ClusterState = {
-  namespace: string;
-  deployments: Deployment[];
-  pods: Pod[];
-};
-
-export type ActionResult = {
+// Order result
+export type OrderResult = {
   success: boolean;
-  points: number;
+  accuracy: number; // 0-100%
+  cashEarned: number;
+  tip: number;
   message: string;
-  newClusterState: ClusterState;
+  missing: string[]; // Missing component types
+  extra: string[]; // Unnecessary component types
 };
 
+// Game phases
+export type GamePhase = "menu" | "playing" | "feedback" | "round_end" | "shop";
+
+// Game state
 export type GameState = {
-  score: number;
-  ticketNumber: number;
-  maxTickets: number;
-  currentTicket: Ticket | null;
-  gameOver: boolean;
+  cash: number;
+  round: number;
+  ordersCompleted: number;
+  maxOrdersPerRound: number;
+  currentOrder: Order | null;
+  buildArea: BuildArea;
+  timeRemaining: number;
+  feedback: OrderResult | null;
+  gamePhase: GamePhase;
+  perfectOrders: number;
 };
 
-export type ClientGameState = {
-  score: number;
-  ticketNumber: number;
-  currentTicket: Ticket | null;
-  clusterState: ClusterState | null;
+// For API responses
+export type OrderResponse = Order;
+
+export type SubmitRequest = {
+  orderId: string;
+  placedComponents: { instanceId: string; componentType: string }[];
   timeRemaining: number;
-  feedback: { success: boolean; message: string; points: number } | null;
-  gameOver: boolean;
 };
+
+export type SubmitResponse = OrderResult;

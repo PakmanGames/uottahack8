@@ -3,7 +3,7 @@
 type FeedbackBannerProps = {
   success: boolean;
   message: string;
-  points: number;
+  points: number; // Actually cash now
 };
 
 export default function FeedbackBanner({
@@ -25,7 +25,9 @@ export default function FeedbackBanner({
           <span className="font-medium">{message}</span>
         </div>
         {points > 0 && (
-          <span className="font-mono font-bold text-lg">+{points} pts</span>
+          <span className="font-mono font-bold text-lg text-emerald-400">
+            +${points.toLocaleString()}
+          </span>
         )}
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 type TimerProps = {
   timeRemaining: number;
+  maxTime?: number;
   onTick: () => void;
   onTimeout: () => void;
   isRunning: boolean;
@@ -11,6 +12,7 @@ type TimerProps = {
 
 export default function Timer({
   timeRemaining,
+  maxTime = 60,
   onTick,
   onTimeout,
   isRunning,
@@ -30,8 +32,8 @@ export default function Timer({
     return () => clearInterval(interval);
   }, [timeRemaining, isRunning, onTick, onTimeout]);
 
-  const isWarning = timeRemaining <= 10;
-  const percentage = (timeRemaining / 30) * 100;
+  const isWarning = timeRemaining <= 15;
+  const percentage = (timeRemaining / maxTime) * 100;
 
   return (
     <div className="flex items-center gap-3">

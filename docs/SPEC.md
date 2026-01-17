@@ -1,47 +1,255 @@
-# Papa's Kuberia - Technical Specification
+# Papa's DO-eria - Technical Specification
 
-> A Papa's Freezeria-style web game where "orders" are Kubernetes ops tickets.  
+> A Papa's Pizzeria-style web game where players build DigitalOcean infrastructure for enterprise customers.  
 > **Stack:** Next.js 14 (App Router) + Tailwind CSS  
 > **Hosting:** DigitalOcean App Platform  
-> **Mode:** Simulation only (in-memory state)
+> **Mode:** Simulation with Terraform code generation
 
 ---
 
-## 1) Acceptance Criteria
+## 1) Game Concept
 
-- [ ] Game presents tickets one at a time
-- [ ] Player completes SCALE_DEPLOYMENT tickets (select deployment, enter replicas)
-- [ ] Player completes RESTART_POD tickets (select pod)
-- [ ] Cluster state updates after each action
-- [ ] Timer counts down (30s per ticket), auto-fails on timeout
-- [ ] Score accumulates (base 100 + time bonus)
-- [ ] Game ends after 5 tickets, shows final score
+Players run a cloud infrastructure shop where enterprise customers (AMD, Amazon, Meta, Netflix, Spotify, etc.) order cloud configurations for their software engineering needs. Players drag-and-drop DigitalOcean components to fulfill orders, then submit to earn cash.
+
+### Core Loop
+```
+CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → SUBMIT_ORDER → EARN_CASH → NEXT_CUSTOMER → (repeat) → ROUND_END → VIEW_EARNINGS → (SHOP) → NEXT_ROUND
+```
+
+---
+
+## 2) Acceptance Criteria
+
+- [ ] Enterprise customers arrive with infrastructure requests
+- [ ] Orders display required components visually
+- [ ] Player drags DO components to a build area
+- [ ] Terraform code generates in real-time as components are added
+- [ ] Validation checks if order matches requirements
+- [ ] Timer counts down (60s per order)
+- [ ] Cash awarded based on accuracy + speed bonus
+- [ ] Round ends after 5 orders
+- [ ] End-of-round screen shows total cash (shop placeholder)
 - [ ] Deployed on DO App Platform
 
 ---
 
-## 2) Game Flow
+## 3) DigitalOcean Components (Draggable Items)
 
-```
-START_GAME → SHOW_TICKET → PLAYER_ACTION → VALIDATE → SHOW_RESULT → NEXT_TICKET → (repeat 5x) → GAME_OVER
-```
+### Compute
+| Component | Icon | Base Cost | Description |
+|-----------|------|-----------|-------------|
+| Droplet (Basic) | 💧 | $5/mo | 1 vCPU, 1GB RAM |
+| Droplet (General) | 💧💧 | $20/mo | 2 vCPU, 4GB RAM |
+| Droplet (CPU-Optimized) | ⚡ | $40/mo | 4 vCPU, 8GB RAM |
+| Droplet (Memory-Optimized) | 🧠 | $60/mo | 2 vCPU, 16GB RAM |
+| App Platform | 📦 | $12/mo | Managed deployment |
+| Kubernetes Cluster | ☸️ | $50/mo | Managed K8s |
 
-### Ticket Types
+### Storage & Database
+| Component | Icon | Base Cost | Description |
+|-----------|------|-----------|-------------|
+| Spaces (Object Storage) | 📁 | $5/mo | 250GB storage |
+| Managed Database (PostgreSQL) | 🐘 | $15/mo | 1 vCPU, 1GB RAM |
+| Managed Database (MySQL) | 🐬 | $15/mo | 1 vCPU, 1GB RAM |
+| Managed Database (Redis) | 🔴 | $15/mo | Cache layer |
+| Managed Database (MongoDB) | 🍃 | $15/mo | Document DB |
+| Block Storage | 💾 | $10/mo | 100GB volume |
 
-| Type | Player Input | Validation |
-|------|--------------|------------|
-| `SCALE_DEPLOYMENT` | deployment name + replica count | action matches ticket target |
-| `RESTART_POD` | pod name | pod belongs to correct deployment |
+### Networking
+| Component | Icon | Base Cost | Description |
+|-----------|------|-----------|-------------|
+| Load Balancer | ⚖️ | $12/mo | Traffic distribution |
+| VPC | 🔒 | $0/mo | Private network |
+| Floating IP | 🌐 | $5/mo | Static IP |
+| CDN | 🚀 | $5/mo | Content delivery |
+| Firewall | 🛡️ | $0/mo | Security rules |
 
-### Scoring
-
-- Base: 100 points
-- Time bonus: remaining seconds × 2
-- Wrong/timeout: 0 points
+### Other
+| Component | Icon | Base Cost | Description |
+|-----------|------|-----------|-------------|
+| Container Registry | 📋 | $5/mo | Docker images |
+| Functions | ⚡ | $2/mo | Serverless |
+| Monitoring | 📊 | $0/mo | Metrics & alerts |
 
 ---
 
-## 3) Architecture
+## 4) Enterprise Customers
+
+### Customer Profiles
+```typescript
+type Customer = {
+  id: string;
+  name: string;           // "AMD", "Meta", "Netflix"
+  logo: string;           // Emoji or icon
+  color: string;          // Brand color
+  patience: number;       // 1-5, affects timer
+  tipMultiplier: number;  // Bonus for perfect orders
+  personality: string;    // Flavor text style
+};
+```
+
+### Customer List
+| Customer | Logo | Color | Patience | Tip | Personality |
+|----------|------|-------|----------|-----|-------------|
+| AMD | 🔺 | #ED1C24 | 3 | 1.2x | Technical, precise |
+| Amazon | 📦 | #FF9900 | 2 | 1.0x | Fast-paced, demanding |
+| Meta | Ⓜ️ | #0668E1 | 4 | 1.5x | Scale-focused |
+| Netflix | 🎬 | #E50914 | 3 | 1.3x | Streaming expertise |
+| Spotify | 🎵 | #1DB954 | 4 | 1.4x | Real-time audio |
+| Shopify | 🛒 | #96BF48 | 3 | 1.2x | E-commerce focused |
+| Stripe | 💳 | #635BFF | 2 | 1.1x | Security-conscious |
+| Uber | 🚗 | #000000 | 2 | 1.0x | High availability |
+| Airbnb | 🏠 | #FF5A5F | 4 | 1.3x | User experience |
+| Slack | 💬 | #4A154B | 3 | 1.2x | Real-time messaging |
+
+---
+
+## 5) Order Types (Software Engineering Scenarios)
+
+### Order Categories
+Orders are real software engineering infrastructure needs:
+
+#### 1. Web Application Stack
+- **Description**: "We need a scalable web app with database"
+- **Required**: 2x Droplet (General), 1x Load Balancer, 1x PostgreSQL, 1x Spaces
+
+#### 2. Microservices Platform
+- **Description**: "Build us a containerized microservices setup"
+- **Required**: 1x Kubernetes Cluster, 1x Container Registry, 1x Redis, 1x Load Balancer
+
+#### 3. Data Pipeline
+- **Description**: "We need real-time data processing infrastructure"
+- **Required**: 3x Droplet (CPU-Optimized), 1x MongoDB, 1x Redis, 1x Block Storage
+
+#### 4. Static Website with CDN
+- **Description**: "Simple marketing site with global delivery"
+- **Required**: 1x Spaces, 1x CDN, 1x Floating IP
+
+#### 5. API Backend
+- **Description**: "RESTful API with caching and storage"
+- **Required**: 2x Droplet (General), 1x PostgreSQL, 1x Redis, 1x Load Balancer
+
+#### 6. Machine Learning Platform
+- **Description**: "Infrastructure for ML model training and serving"
+- **Required**: 2x Droplet (CPU-Optimized), 1x Droplet (Memory-Optimized), 1x Block Storage, 1x Spaces
+
+#### 7. E-commerce Platform
+- **Description**: "Full e-commerce with payments and inventory"
+- **Required**: 2x Droplet (General), 1x PostgreSQL, 1x Redis, 1x Load Balancer, 1x Spaces
+
+#### 8. Real-time Chat System
+- **Description**: "WebSocket-based messaging infrastructure"
+- **Required**: 2x Droplet (Memory-Optimized), 1x Redis, 1x MongoDB, 1x Load Balancer
+
+#### 9. CI/CD Pipeline
+- **Description**: "Continuous integration and deployment setup"
+- **Required**: 1x Droplet (General), 1x Container Registry, 1x Spaces, 1x Functions
+
+#### 10. Gaming Backend
+- **Description**: "Multiplayer game server infrastructure"
+- **Required**: 3x Droplet (CPU-Optimized), 1x Redis, 1x PostgreSQL, 1x Load Balancer
+
+---
+
+## 6) Types
+
+```typescript
+// lib/types.ts
+
+// DO Component Categories
+export type ComponentCategory = 
+  | "compute" 
+  | "storage" 
+  | "database" 
+  | "networking" 
+  | "other";
+
+// Individual DO Component
+export type DOComponent = {
+  id: string;
+  type: string;           // "droplet-basic", "postgres", "load-balancer"
+  name: string;           // Display name
+  icon: string;           // Emoji icon
+  category: ComponentCategory;
+  monthlyCost: number;
+  description: string;
+  terraformResource: string;  // "digitalocean_droplet"
+};
+
+// Customer placing order
+export type Customer = {
+  id: string;
+  name: string;
+  logo: string;
+  color: string;
+  patience: number;
+  tipMultiplier: number;
+  personality: string;
+};
+
+// Order ticket from customer
+export type Order = {
+  orderId: string;
+  customer: Customer;
+  scenario: string;        // "Web Application Stack"
+  description: string;     // Customer's request text
+  requiredComponents: OrderComponent[];
+  timeLimitSec: number;
+  baseReward: number;
+};
+
+// Component required in order (with quantity)
+export type OrderComponent = {
+  componentType: string;
+  quantity: number;
+};
+
+// Player's current build
+export type BuildArea = {
+  placedComponents: PlacedComponent[];
+};
+
+export type PlacedComponent = {
+  instanceId: string;      // Unique per placement
+  component: DOComponent;
+};
+
+// Terraform output
+export type TerraformConfig = {
+  code: string;
+  valid: boolean;
+  estimatedMonthlyCost: number;
+};
+
+// Order result
+export type OrderResult = {
+  success: boolean;
+  accuracy: number;        // 0-100%
+  cashEarned: number;
+  tip: number;
+  message: string;
+  missing: string[];       // Missing components
+  extra: string[];         // Unnecessary components
+};
+
+// Game state
+export type GameState = {
+  cash: number;
+  round: number;
+  ordersCompleted: number;
+  ordersInRound: number;
+  maxOrdersPerRound: number;
+  currentOrder: Order | null;
+  buildArea: BuildArea;
+  timeRemaining: number;
+  feedback: OrderResult | null;
+  gamePhase: "menu" | "playing" | "round_end" | "shop";
+};
+```
+
+---
+
+## 7) Architecture
 
 ```
 app/
@@ -49,376 +257,308 @@ app/
 ├── layout.tsx
 ├── globals.css
 └── api/
-    ├── cluster/route.ts        # GET - returns cluster state
-    ├── ticket/route.ts         # POST - generates new ticket
-    ├── action/route.ts         # POST - validates and applies action
+    ├── order/route.ts          # POST - generates new order
+    ├── submit/route.ts         # POST - validates and scores order
     └── reset/route.ts          # POST - resets game state
 
 lib/
 ├── types.ts                    # TypeScript types
-├── cluster-state.ts            # In-memory state manager
-└── ticket-generator.ts         # Random ticket generation
+├── components-data.ts          # DO component definitions
+├── customers-data.ts           # Customer profiles
+├── order-generator.ts          # Random order generation
+├── terraform-generator.ts      # Generate TF code from components
+└── scoring.ts                  # Calculate cash/accuracy
 
 components/
-├── TicketCard.tsx
-├── ActionControls.tsx
-├── ClusterPanel.tsx
-├── Timer.tsx
-└── ScoreDisplay.tsx
+├── OrderTicket.tsx             # Customer order display
+├── ComponentPalette.tsx        # Draggable components sidebar
+├── BuildArea.tsx               # Drop zone for building
+├── TerraformPreview.tsx        # Live TF code display
+├── CashDisplay.tsx             # Current cash
+├── Timer.tsx                   # Countdown timer
+├── CustomerAvatar.tsx          # Customer display
+├── FeedbackBanner.tsx          # Order result
+├── RoundEnd.tsx                # End of round screen
+└── Shop.tsx                    # Upgrades (placeholder)
 ```
 
 ---
 
-## 4) Types
+## 8) API Contracts
 
-```typescript
-// lib/types.ts
-
-export type TicketType = "SCALE_DEPLOYMENT" | "RESTART_POD";
-
-export type Ticket = {
-  ticketId: string;
-  type: TicketType;
-  target: {
-    deployment?: string;
-    pod?: string;
-    replicas?: number;
-  };
-  description: string;
-  timeLimitSec: number;
-};
-
-export type Action =
-  | { type: "SCALE_DEPLOYMENT"; deployment: string; replicas: number }
-  | { type: "RESTART_POD"; pod: string };
-
-export type Deployment = {
-  name: string;
-  replicas: number;
-  readyReplicas: number;
-};
-
-export type Pod = {
-  name: string;
-  ready: boolean;
-  status: string;
-  owner: string; // deployment name
-};
-
-export type ClusterState = {
-  namespace: string;
-  deployments: Deployment[];
-  pods: Pod[];
-};
-
-export type ActionResult = {
-  success: boolean;
-  points: number;
-  message: string;
-  newClusterState: ClusterState;
-};
-
-export type GameState = {
-  score: number;
-  ticketNumber: number;
-  maxTickets: number;
-  currentTicket: Ticket | null;
-  gameOver: boolean;
-};
-```
-
----
-
-## 5) API Contracts
-
-### GET `/api/cluster`
-
-Returns current cluster state.
+### POST `/api/order`
+Generates a new random order for current round.
 
 **Response:**
-
 ```json
 {
-  "namespace": "kuberia",
-  "deployments": [
-    { "name": "smoothie-api", "replicas": 2, "readyReplicas": 2 },
-    { "name": "toppings-worker", "replicas": 1, "readyReplicas": 1 },
-    { "name": "order-queue", "replicas": 2, "readyReplicas": 2 }
-  ],
-  "pods": [
-    { "name": "smoothie-api-x7k2m", "ready": true, "status": "Running", "owner": "smoothie-api" },
-    { "name": "smoothie-api-p9n3q", "ready": true, "status": "Running", "owner": "smoothie-api" }
-  ]
-}
-```
-
-### POST `/api/ticket`
-
-Generates a new random ticket based on current cluster state.
-
-**Response:**
-
-```json
-{
-  "ticketId": "t_001",
-  "type": "SCALE_DEPLOYMENT",
-  "target": {
-    "deployment": "smoothie-api",
-    "replicas": 3
+  "orderId": "order_001",
+  "customer": {
+    "id": "netflix",
+    "name": "Netflix",
+    "logo": "🎬",
+    "color": "#E50914",
+    "patience": 3,
+    "tipMultiplier": 1.3
   },
-  "description": "Scale smoothie-api to 3 replicas",
-  "timeLimitSec": 30
+  "scenario": "Real-time Chat System",
+  "description": "We need WebSocket infrastructure for our new messaging feature. Should handle millions of concurrent connections!",
+  "requiredComponents": [
+    { "componentType": "droplet-memory", "quantity": 2 },
+    { "componentType": "redis", "quantity": 1 },
+    { "componentType": "mongodb", "quantity": 1 },
+    { "componentType": "load-balancer", "quantity": 1 }
+  ],
+  "timeLimitSec": 60,
+  "baseReward": 500
 }
 ```
 
-**Generation logic:**
-
-- Pick random deployment
-- For SCALE: choose replica count different from current (1-5 range)
-- For RESTART: pick random pod from a deployment
-
-### POST `/api/action`
-
-Validates player action against current ticket and updates cluster state.
+### POST `/api/submit`
+Validates player's build against order requirements.
 
 **Request:**
-
 ```json
 {
-  "ticketId": "t_001",
-  "action": {
-    "type": "SCALE_DEPLOYMENT",
-    "deployment": "smoothie-api",
-    "replicas": 3
-  }
+  "orderId": "order_001",
+  "placedComponents": [
+    { "instanceId": "inst_1", "componentType": "droplet-memory" },
+    { "instanceId": "inst_2", "componentType": "droplet-memory" },
+    { "instanceId": "inst_3", "componentType": "redis" },
+    { "instanceId": "inst_4", "componentType": "mongodb" },
+    { "instanceId": "inst_5", "componentType": "load-balancer" }
+  ],
+  "timeRemaining": 35
 }
 ```
 
 **Response (success):**
-
 ```json
 {
   "success": true,
-  "points": 148,
-  "message": "Scaled smoothie-api to 3 replicas!",
-  "newClusterState": { ... }
+  "accuracy": 100,
+  "cashEarned": 500,
+  "tip": 150,
+  "message": "Perfect infrastructure! Netflix is impressed!",
+  "missing": [],
+  "extra": []
 }
 ```
 
-**Response (failure):**
-
+**Response (partial):**
 ```json
 {
-  "success": false,
-  "points": 0,
-  "message": "Wrong deployment selected",
-  "newClusterState": { ... }
+  "success": true,
+  "accuracy": 80,
+  "cashEarned": 400,
+  "tip": 0,
+  "message": "Good effort, but you forgot the Redis cache.",
+  "missing": ["redis"],
+  "extra": []
 }
 ```
 
 ### POST `/api/reset`
-
-Resets cluster state to initial values.
-
-**Response:**
-
-```json
-{ "success": true }
-```
+Resets game to initial state.
 
 ---
 
-## 6) Cluster State Manager
+## 9) Terraform Generation
 
-```typescript
-// lib/cluster-state.ts
+As players add components, generate real Terraform code:
 
-const INITIAL_DEPLOYMENTS: Deployment[] = [
-  { name: "smoothie-api", replicas: 2, readyReplicas: 2 },
-  { name: "toppings-worker", replicas: 1, readyReplicas: 1 },
-  { name: "order-queue", replicas: 2, readyReplicas: 2 },
-];
+```hcl
+# Generated by Papa's DO-eria
+# Customer: Netflix
+# Order: Real-time Chat System
 
-// In-memory state (resets on server restart)
-let deployments = structuredClone(INITIAL_DEPLOYMENTS);
-let pods = generatePods(deployments);
-
-function randomSuffix(): string {
-  return Math.random().toString(36).substring(2, 7);
-}
-
-function generatePods(deps: Deployment[]): Pod[] {
-  return deps.flatMap((dep) =>
-    Array.from({ length: dep.replicas }, () => ({
-      name: `${dep.name}-${randomSuffix()}`,
-      ready: true,
-      status: "Running",
-      owner: dep.name,
-    }))
-  );
-}
-
-export function getClusterState(): ClusterState {
-  return { namespace: "kuberia", deployments, pods };
-}
-
-export function scaleDeployment(name: string, replicas: number): void {
-  const dep = deployments.find((d) => d.name === name);
-  if (dep) {
-    dep.replicas = replicas;
-    dep.readyReplicas = replicas;
-    pods = generatePods(deployments);
+terraform {
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "~> 2.0"
+    }
   }
 }
 
-export function restartPod(podName: string): void {
-  const pod = pods.find((p) => p.name === podName);
-  if (pod) {
-    pod.name = `${pod.owner}-${randomSuffix()}`;
-  }
-}
-
-export function resetState(): void {
-  deployments = structuredClone(INITIAL_DEPLOYMENTS);
-  pods = generatePods(deployments);
-}
-```
-
----
-
-## 7) Ticket Generator
-
-```typescript
-// lib/ticket-generator.ts
-
-let ticketCounter = 0;
-
-export function generateTicket(clusterState: ClusterState): Ticket {
-  ticketCounter++;
-  const ticketId = `t_${String(ticketCounter).padStart(3, "0")}`;
+resource "digitalocean_droplet" "chat_server_1" {
+  image  = "ubuntu-22-04-x64"
+  name   = "chat-server-1"
+  region = "nyc3"
+  size   = "m-2vcpu-16gb"
   
-  // Randomly choose ticket type
-  const type: TicketType = Math.random() > 0.5 ? "SCALE_DEPLOYMENT" : "RESTART_POD";
+  tags = ["chat", "websocket"]
+}
+
+resource "digitalocean_droplet" "chat_server_2" {
+  image  = "ubuntu-22-04-x64"
+  name   = "chat-server-2"
+  region = "nyc3"
+  size   = "m-2vcpu-16gb"
   
-  if (type === "SCALE_DEPLOYMENT") {
-    const dep = randomItem(clusterState.deployments);
-    const newReplicas = pickDifferentReplicas(dep.replicas);
-    return {
-      ticketId,
-      type: "SCALE_DEPLOYMENT",
-      target: { deployment: dep.name, replicas: newReplicas },
-      description: `Scale ${dep.name} to ${newReplicas} replicas`,
-      timeLimitSec: 30,
-    };
-  } else {
-    const dep = randomItem(clusterState.deployments);
-    const depPods = clusterState.pods.filter((p) => p.owner === dep.name);
-    const pod = randomItem(depPods);
-    return {
-      ticketId,
-      type: "RESTART_POD",
-      target: { pod: pod.name, deployment: dep.name },
-      description: `Restart pod ${pod.name}`,
-      timeLimitSec: 30,
-    };
+  tags = ["chat", "websocket"]
+}
+
+resource "digitalocean_database_cluster" "redis" {
+  name       = "chat-cache"
+  engine     = "redis"
+  version    = "7"
+  size       = "db-s-1vcpu-1gb"
+  region     = "nyc3"
+  node_count = 1
+}
+
+resource "digitalocean_database_cluster" "mongodb" {
+  name       = "chat-db"
+  engine     = "mongodb"
+  version    = "6"
+  size       = "db-s-1vcpu-1gb"
+  region     = "nyc3"
+  node_count = 1
+}
+
+resource "digitalocean_loadbalancer" "chat_lb" {
+  name   = "chat-loadbalancer"
+  region = "nyc3"
+
+  forwarding_rule {
+    entry_port     = 443
+    entry_protocol = "https"
+    target_port    = 8080
+    target_protocol = "http"
   }
-}
 
-function randomItem<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function pickDifferentReplicas(current: number): number {
-  const options = [1, 2, 3, 4, 5].filter((n) => n !== current);
-  return randomItem(options);
-}
-
-export function resetTicketCounter(): void {
-  ticketCounter = 0;
+  droplet_ids = [
+    digitalocean_droplet.chat_server_1.id,
+    digitalocean_droplet.chat_server_2.id
+  ]
 }
 ```
 
 ---
 
-## 8) UI Layout
+## 10) Scoring System
 
+### Base Calculation
 ```
-┌─────────────────────────────────────────────────┐
-│  PAPA'S KUBERIA           Score: 340    ⏱️ 25s  │
-├─────────────────────────────────────────────────┤
-│                                                 │
-│  ┌───────────────────────────────────────────┐  │
-│  │  TICKET #3 / 5                            │  │
-│  │  "Scale smoothie-api to 3 replicas"       │  │
-│  └───────────────────────────────────────────┘  │
-│                                                 │
-│  ┌─────────────┐ ┌──────────┐ ┌─────────────┐  │
-│  │ Deployment ▼│ │ Replicas │ │   SUBMIT    │  │
-│  └─────────────┘ └──────────┘ └─────────────┘  │
-│                                                 │
-│  ┌───────────────────────────────────────────┐  │
-│  │  ✓ Success! +148 points                   │  │
-│  └───────────────────────────────────────────┘  │
-│                                                 │
-├─────────────────────────────────────────────────┤
-│  CLUSTER STATE                                  │
-│  ┌───────────────────────────────────────────┐  │
-│  │ smoothie-api       3/3 ready              │  │
-│  │ toppings-worker    1/1 ready              │  │
-│  │ order-queue        2/2 ready              │  │
-│  └───────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
+Base Reward = Order base value ($200-$800)
+Accuracy Multiplier = Components matched / Components required
+Time Bonus = (timeRemaining / totalTime) * 0.25 * baseReward
+Tip = (accuracy == 100%) ? baseReward * customer.tipMultiplier - baseReward : 0
+
+Total = (baseReward * accuracyMultiplier) + timeBonus + tip
 ```
 
-### Component Behavior
-
-**ActionControls:**
-
-- If ticket type is `SCALE_DEPLOYMENT`: show deployment dropdown + replicas number input
-- If ticket type is `RESTART_POD`: show pod dropdown only
-
-**Timer:**
-
-- Counts down from 30 seconds
-- Visual warning (red) when < 10 seconds
-- On timeout: submit failure, advance to next ticket
-
-**ClusterPanel:**
-
-- Refreshes after each action
-- Shows deployment name and ready/total replicas
+### Penalties
+- Missing component: -20% per missing
+- Extra unnecessary component: -5% per extra
+- Timeout: 0 cash, order fails
 
 ---
 
-## 9) Client State
+## 11) UI Layout
 
-```typescript
-// Managed in page.tsx with useState/useReducer
-
-type ClientGameState = {
-  score: number;
-  ticketNumber: number;
-  currentTicket: Ticket | null;
-  clusterState: ClusterState | null;
-  timeRemaining: number;
-  feedback: { success: boolean; message: string; points: number } | null;
-  gameOver: boolean;
-};
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PAPA'S DO-ERIA                               💰 $2,450    ⏱️ 45s           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │  🎬 NETFLIX                                    Order #3/5              ││
+│  │  ─────────────────────────────────────────────────────────────────────  ││
+│  │  "We need WebSocket infrastructure for our new messaging feature!"     ││
+│  │                                                                         ││
+│  │  REQUIRED:  💧💧 x2   🔴 x1   🍃 x1   ⚖️ x1                              ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                                                             │
+│  ┌───────────────┐  ┌──────────────────────────────────────────────────────┐│
+│  │  COMPONENTS   │  │  BUILD AREA                                          ││
+│  │  ───────────  │  │  ┌────────────────────────────────────────────────┐  ││
+│  │  💧 Droplet   │  │  │  💧💧  🔴  🍃  ⚖️                                │  ││
+│  │  🐘 Postgres  │  │  │                                                │  ││
+│  │  🔴 Redis     │  │  │  [Drag components here]                        │  ││
+│  │  ⚖️ Load Bal  │  │  └────────────────────────────────────────────────┘  ││
+│  │  📁 Spaces    │  │                                                      ││
+│  │  ...         │  │  Monthly Cost: $127/mo                               ││
+│  └───────────────┘  └──────────────────────────────────────────────────────┘│
+│                                                                             │
+│  ┌──────────────────────────────────────────────────────────────────┐       │
+│  │  TERRAFORM PREVIEW                                                │       │
+│  │  ```hcl                                                          │       │
+│  │  resource "digitalocean_droplet" "server_1" {                    │       │
+│  │    image = "ubuntu-22-04-x64"                                    │       │
+│  │    ...                                                           │       │
+│  │  ```                                                             │       │
+│  └──────────────────────────────────────────────────────────────────┘       │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │                        [ 🚀 SUBMIT ORDER ]                              ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 10) Setup Commands
+## 12) Round End / Shop Screen
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         ROUND COMPLETE!                         │
+│                                                                 │
+│                    Orders Completed: 5/5                        │
+│                    Total Earnings: $2,450                       │
+│                    Perfect Orders: 3                            │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                    💰 TOTAL CASH: $2,450                 │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                   🏪 SHOP (Coming Soon!)                 │   │
+│  │                                                         │   │
+│  │   Upgrades will be available in a future update:        │   │
+│  │   • Faster dragging                                     │   │
+│  │   • More time per order                                 │   │
+│  │   • Auto-complete hints                                 │   │
+│  │   • Unlock premium customers                            │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│                    [ 🎮 NEXT ROUND ]                            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 13) Implementation Notes
+
+### Drag and Drop
+- Use native HTML5 drag and drop or react-dnd
+- Components can be dragged from palette to build area
+- Click to remove from build area
+- Visual feedback on valid drop zones
+
+### Real-time Terraform
+- Update TF code on every component add/remove
+- Syntax highlighting with CSS
+- Collapse/expand toggle
+
+### Responsive Design
+- Desktop-first (drag-drop works best)
+- Mobile: tap-to-add instead of drag
+
+---
+
+## 14) Setup Commands
 
 ```bash
-npx create-next-app@latest papas-kuberia --typescript --tailwind --app --eslint
-cd papas-kuberia
+npx create-next-app@latest papas-do-eria --typescript --tailwind --app --eslint
+cd papas-do-eria
 npm run dev
 ```
 
 ---
 
-## 11) Deployment
+## 15) Deployment
 
 Push to GitHub. Connect repo to DO App Platform.
 
@@ -428,9 +568,12 @@ Push to GitHub. Connect repo to DO App Platform.
 
 ---
 
-## 12) Stretch Goals (Priority Order)
+## 16) Stretch Goals (Priority Order)
 
-1. Visual polish (colors, hover states)
-2. Sound effects (success ding, fail buzz)
-3. Animations (ticket slide in, score pop)
-4. Real DOKS cluster integration with mode toggle
+1. Sound effects (cash register, component placement)
+2. Animations (component slide, cash pop)
+3. Real customer logos (with permission)
+4. Leaderboard
+5. More order scenarios
+6. Functional shop with upgrades
+7. Difficulty levels
