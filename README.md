@@ -1,23 +1,23 @@
-# Papa's Kuberia 🎮☸️
+# Papa's DO-eria 🎮☁️
 
-A Papa's Freezeria-style web game where "orders" are Kubernetes ops tickets!
+A Papa's Pizzeria-style web game where players build DigitalOcean infrastructure for enterprise customers!
 
 ## About
 
-Papa's Kuberia is a fun, educational game that teaches Kubernetes operations in an engaging way. Players take on the role of a Kubernetes operator, completing tickets to scale deployments and restart pods before time runs out.
+Papa's DO-eria is a fun, educational game that teaches cloud infrastructure concepts. Players run a cloud infrastructure shop where enterprise customers (AMD, Amazon, Meta, Netflix, etc.) order cloud configurations. Drag and drop DigitalOcean components to fulfill orders and earn cash!
 
 ## Features
 
-- 🎫 **Ticket-based gameplay** - Complete ops tickets one at a time
-- ⚖️ **Scale Deployments** - Select the right deployment and replica count
-- 🔄 **Restart Pods** - Choose the correct pod to restart
-- ⏱️ **Time pressure** - 30 seconds per ticket with time bonus scoring
-- 📊 **Score tracking** - Base 100 points + 2 points per remaining second
-- 🏆 **Star ratings** - Get rated based on your final score
+- 🏢 **Enterprise Customers** - 12 real tech companies with unique personalities
+- 📦 **20 DO Components** - Droplets, Databases, Load Balancers, Kubernetes, and more
+- 📋 **12 Infrastructure Scenarios** - Web apps, microservices, ML platforms, gaming backends
+- 📄 **Real Terraform Code** - See your infrastructure as Terraform HCL in real-time
+- ⏱️ **Time Pressure** - Dynamic timers based on customer patience and order complexity
+- 💰 **Scoring System** - Earn cash based on accuracy, speed, and customer tips
 
 ## Tech Stack
 
-- **Framework:** Next.js 14 (App Router)
+- **Framework:** Next.js 15 (App Router)
 - **Styling:** Tailwind CSS
 - **Language:** TypeScript
 - **Hosting:** DigitalOcean App Platform
@@ -33,8 +33,8 @@ Papa's Kuberia is a fun, educational game that teaches Kubernetes operations in 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/papas-kuberia.git
-cd papas-kuberia
+git clone https://github.com/yourusername/papas-do-eria.git
+cd papas-do-eria
 
 # Install dependencies
 npm install
@@ -45,14 +45,19 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to play!
 
-## Game Rules
+## How to Play
 
-1. Each game consists of 5 tickets
-2. Complete each ticket within 30 seconds
-3. For **SCALE_DEPLOYMENT**: Select the correct deployment and set the target replica count
-4. For **RESTART_POD**: Select the correct pod to restart
-5. Score = 100 base points + (remaining seconds × 2)
-6. Wrong answers or timeouts = 0 points
+1. **Read the Order** - Check what components the customer needs
+2. **Build Infrastructure** - Click components to add them to the build area
+3. **Review Terraform** - Check the live Terraform code preview
+4. **Submit** - Deliver the order and earn cash!
+
+### Scoring
+
+- **Base Reward:** $200-$650 depending on order complexity
+- **Time Bonus:** Up to 25% extra for fast completion
+- **Tips:** Perfect orders earn customer tips (1.0x-1.5x multiplier)
+- **Penalties:** Missing components reduce payment; <50% accuracy = $0
 
 ## Project Structure
 
@@ -62,24 +67,27 @@ app/
 ├── layout.tsx
 ├── globals.css
 └── api/
-    ├── cluster/route.ts        # GET - returns cluster state
-    ├── ticket/route.ts         # POST - generates new ticket
-    ├── action/route.ts         # POST - validates and applies action
+    ├── order/route.ts          # POST - generates new order
+    ├── submit/route.ts         # POST - validates and scores order
     └── reset/route.ts          # POST - resets game state
 
 lib/
 ├── types.ts                    # TypeScript types
-├── cluster-state.ts            # In-memory state manager
-└── ticket-generator.ts         # Random ticket generation
+├── components-data.ts          # DO component definitions
+├── customers-data.ts           # Customer profiles
+├── order-generator.ts          # Random order generation
+├── terraform-generator.ts      # TF code generation
+└── scoring.ts                  # Calculate cash/accuracy
 
 components/
-├── TicketCard.tsx
-├── ActionControls.tsx
-├── ClusterPanel.tsx
-├── Timer.tsx
-├── ScoreDisplay.tsx
-├── FeedbackBanner.tsx
-└── GameOver.tsx
+├── OrderTicket.tsx             # Customer order display
+├── ComponentPalette.tsx        # Draggable components sidebar
+├── BuildArea.tsx               # Drop zone for building
+├── TerraformPreview.tsx        # Live TF code display
+├── CashDisplay.tsx             # Current cash
+├── Timer.tsx                   # Countdown timer
+├── FeedbackBanner.tsx          # Order result
+└── RoundEnd.tsx                # End of round screen
 ```
 
 ## Deployment
@@ -96,6 +104,7 @@ npm start
 ## Documentation
 
 - [Technical Specification](docs/SPEC.md)
+- [Implementation Status](docs/IMPLEMENTATION_STATUS.md)
 - [DigitalOcean Setup Guide](docs/DIGITALOCEAN_SETUP.md)
 
 ## License

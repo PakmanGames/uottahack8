@@ -1,6 +1,6 @@
 # DigitalOcean App Platform Setup Guide
 
-This guide walks you through deploying Papa's Kuberia on DigitalOcean App Platform.
+This guide walks you through deploying Papa's DO-eria on DigitalOcean App Platform.
 
 ---
 
@@ -18,7 +18,7 @@ Ensure your repository contains the complete Next.js application:
 
 ```bash
 git add .
-git commit -m "Initial commit: Papa's Kuberia game"
+git commit -m "Initial commit: Papa's DO-eria game"
 git push origin main
 ```
 

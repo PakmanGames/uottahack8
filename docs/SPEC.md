@@ -1,9 +1,27 @@
 # Papa's DO-eria - Technical Specification
 
 > A Papa's Pizzeria-style web game where players build DigitalOcean infrastructure for enterprise customers.  
-> **Stack:** Next.js 14 (App Router) + Tailwind CSS  
+> **Stack:** Next.js 15 (App Router) + Tailwind CSS + TypeScript  
 > **Hosting:** DigitalOcean App Platform  
 > **Mode:** Simulation with Terraform code generation
+
+---
+
+## ⚠️ AI Implementation Context
+
+**Time Constraint:** ~5 hours total development time  
+**Purpose:** This spec is context for AI tools to build/extend the project  
+**Priority:** Core gameplay loop > Polish > Stretch features
+
+### Implementation Priorities
+1. **P0 (Must Have):** Working game loop, component selection, scoring, terraform preview
+2. **P1 (Should Have):** Visual polish, better feedback, mobile support  
+3. **P2 (Nice to Have):** Sound effects, animations, shop system
+4. **P3 (Stretch):** Leaderboard, difficulty levels
+
+### Related Docs
+- **`IMPLEMENTATION_STATUS.md`** - What's done vs needs work (check this first!)
+- **`DIGITALOCEAN_SETUP.md`** - Deployment instructions
 
 ---
 
@@ -13,22 +31,32 @@ Players run a cloud infrastructure shop where enterprise customers (AMD, Amazon,
 
 ### Core Loop
 ```
-CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → SUBMIT_ORDER → EARN_CASH → NEXT_CUSTOMER → (repeat) → ROUND_END → VIEW_EARNINGS → (SHOP) → NEXT_ROUND
+MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → SUBMIT_ORDER → EARN_CASH → NEXT_CUSTOMER → (repeat x5) → ROUND_END → VIEW_EARNINGS → NEXT_ROUND
 ```
 
 ---
 
 ## 2) Acceptance Criteria
 
-- [ ] Enterprise customers arrive with infrastructure requests
-- [ ] Orders display required components visually
-- [ ] Player drags DO components to a build area
-- [ ] Terraform code generates in real-time as components are added
-- [ ] Validation checks if order matches requirements
-- [ ] Timer counts down (60s per order)
-- [ ] Cash awarded based on accuracy + speed bonus
-- [ ] Round ends after 5 orders
-- [ ] End-of-round screen shows total cash (shop placeholder)
+### Core Gameplay (P0)
+- [x] Enterprise customers arrive with infrastructure requests
+- [x] Orders display required components visually
+- [x] Player clicks/drags DO components to a build area
+- [x] Terraform code generates in real-time as components are added
+- [x] Validation checks if order matches requirements
+- [x] Timer counts down (dynamic based on order complexity)
+- [x] Cash awarded based on accuracy + speed bonus
+- [x] Round ends after 5 orders
+- [x] End-of-round screen shows total cash and stats
+- [x] Menu screen with game instructions
+
+### Polish & UX (P1)
+- [x] Feedback banner shows order result
+- [x] Components organized by category in palette
+- [ ] Mobile-friendly tap-to-add interaction
+- [ ] Visual indicators for matched/missing components
+
+### Deployment (P0)
 - [ ] Deployed on DO App Platform
 
 ---
@@ -80,15 +108,15 @@ CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → SUBMIT_ORDER → EARN_CA
 type Customer = {
   id: string;
   name: string;           // "AMD", "Meta", "Netflix"
-  logo: string;           // Emoji or icon
-  color: string;          // Brand color
-  patience: number;       // 1-5, affects timer
-  tipMultiplier: number;  // Bonus for perfect orders
-  personality: string;    // Flavor text style
+  logo: string;           // Emoji icon
+  color: string;          // Brand color (hex)
+  patience: number;       // 1-5, affects timer duration
+  tipMultiplier: number;  // Bonus multiplier for perfect orders
+  personality: string;    // Flavor text for order descriptions
 };
 ```
 
-### Customer List
+### Customer List (12 customers implemented)
 | Customer | Logo | Color | Patience | Tip | Personality |
 |----------|------|-------|----------|-----|-------------|
 | AMD | 🔺 | #ED1C24 | 3 | 1.2x | Technical, precise |
@@ -101,53 +129,51 @@ type Customer = {
 | Uber | 🚗 | #000000 | 2 | 1.0x | High availability |
 | Airbnb | 🏠 | #FF5A5F | 4 | 1.3x | User experience |
 | Slack | 💬 | #4A154B | 3 | 1.2x | Real-time messaging |
+| Discord | 🎮 | #5865F2 | 3 | 1.3x | Gamers, low latency |
+| Twitch | 📺 | #9146FF | 2 | 1.2x | Live streaming |
 
 ---
 
 ## 5) Order Types (Software Engineering Scenarios)
 
 ### Order Categories
-Orders are real software engineering infrastructure needs:
+Orders are real software engineering infrastructure needs. Each scenario has multiple description variants for variety. **12 scenarios implemented:**
 
-#### 1. Web Application Stack
-- **Description**: "We need a scalable web app with database"
+#### 1. Web Application Stack ($400 base)
 - **Required**: 2x Droplet (General), 1x Load Balancer, 1x PostgreSQL, 1x Spaces
 
-#### 2. Microservices Platform
-- **Description**: "Build us a containerized microservices setup"
-- **Required**: 1x Kubernetes Cluster, 1x Container Registry, 1x Redis, 1x Load Balancer
+#### 2. Microservices Platform ($500 base)
+- **Required**: 1x Kubernetes, 1x Container Registry, 1x Redis, 1x Load Balancer
 
-#### 3. Data Pipeline
-- **Description**: "We need real-time data processing infrastructure"
-- **Required**: 3x Droplet (CPU-Optimized), 1x MongoDB, 1x Redis, 1x Block Storage
+#### 3. Data Pipeline ($550 base)
+- **Required**: 3x Droplet (CPU), 1x MongoDB, 1x Redis, 1x Block Storage
 
-#### 4. Static Website with CDN
-- **Description**: "Simple marketing site with global delivery"
+#### 4. Static Website with CDN ($200 base)
 - **Required**: 1x Spaces, 1x CDN, 1x Floating IP
 
-#### 5. API Backend
-- **Description**: "RESTful API with caching and storage"
+#### 5. API Backend ($450 base)
 - **Required**: 2x Droplet (General), 1x PostgreSQL, 1x Redis, 1x Load Balancer
 
-#### 6. Machine Learning Platform
-- **Description**: "Infrastructure for ML model training and serving"
-- **Required**: 2x Droplet (CPU-Optimized), 1x Droplet (Memory-Optimized), 1x Block Storage, 1x Spaces
+#### 6. Machine Learning Platform ($600 base)
+- **Required**: 2x Droplet (CPU), 1x Droplet (Memory), 1x Block Storage, 1x Spaces
 
-#### 7. E-commerce Platform
-- **Description**: "Full e-commerce with payments and inventory"
+#### 7. E-commerce Platform ($550 base)
 - **Required**: 2x Droplet (General), 1x PostgreSQL, 1x Redis, 1x Load Balancer, 1x Spaces
 
-#### 8. Real-time Chat System
-- **Description**: "WebSocket-based messaging infrastructure"
-- **Required**: 2x Droplet (Memory-Optimized), 1x Redis, 1x MongoDB, 1x Load Balancer
+#### 8. Real-time Chat System ($500 base)
+- **Required**: 2x Droplet (Memory), 1x Redis, 1x MongoDB, 1x Load Balancer
 
-#### 9. CI/CD Pipeline
-- **Description**: "Continuous integration and deployment setup"
+#### 9. CI/CD Pipeline ($350 base)
 - **Required**: 1x Droplet (General), 1x Container Registry, 1x Spaces, 1x Functions
 
-#### 10. Gaming Backend
-- **Description**: "Multiplayer game server infrastructure"
-- **Required**: 3x Droplet (CPU-Optimized), 1x Redis, 1x PostgreSQL, 1x Load Balancer
+#### 10. Gaming Backend ($600 base)
+- **Required**: 3x Droplet (CPU), 1x Redis, 1x PostgreSQL, 1x Load Balancer
+
+#### 11. Video Streaming Platform ($650 base)
+- **Required**: 2x Droplet (CPU), 1x Spaces, 1x CDN, 1x Load Balancer, 1x Redis
+
+#### 12. IoT Platform ($500 base)
+- **Required**: 2x Droplet (General), 1x MongoDB, 1x Redis, 1x Functions, 1x Monitoring
 
 ---
 
@@ -173,7 +199,8 @@ export type DOComponent = {
   category: ComponentCategory;
   monthlyCost: number;
   description: string;
-  terraformResource: string;  // "digitalocean_droplet"
+  terraformResource: string;         // "digitalocean_droplet"
+  terraformConfig: Record<string, unknown>;  // Terraform-specific config
 };
 
 // Customer placing order
@@ -182,9 +209,15 @@ export type Customer = {
   name: string;
   logo: string;
   color: string;
-  patience: number;
+  patience: number;       // 1-5, affects timer
   tipMultiplier: number;
   personality: string;
+};
+
+// Component required in order (with quantity)
+export type OrderComponent = {
+  componentType: string;
+  quantity: number;
 };
 
 // Order ticket from customer
@@ -198,27 +231,15 @@ export type Order = {
   baseReward: number;
 };
 
-// Component required in order (with quantity)
-export type OrderComponent = {
-  componentType: string;
-  quantity: number;
-};
-
-// Player's current build
-export type BuildArea = {
-  placedComponents: PlacedComponent[];
-};
-
+// Placed component in build area
 export type PlacedComponent = {
   instanceId: string;      // Unique per placement
   component: DOComponent;
 };
 
-// Terraform output
-export type TerraformConfig = {
-  code: string;
-  valid: boolean;
-  estimatedMonthlyCost: number;
+// Player's current build
+export type BuildArea = {
+  placedComponents: PlacedComponent[];
 };
 
 // Order result
@@ -228,23 +249,37 @@ export type OrderResult = {
   cashEarned: number;
   tip: number;
   message: string;
-  missing: string[];       // Missing components
-  extra: string[];         // Unnecessary components
+  missing: string[];       // Missing component types
+  extra: string[];         // Unnecessary component types
 };
+
+// Game phases
+export type GamePhase = "menu" | "playing" | "feedback" | "round_end" | "shop";
 
 // Game state
 export type GameState = {
   cash: number;
   round: number;
   ordersCompleted: number;
-  ordersInRound: number;
   maxOrdersPerRound: number;
   currentOrder: Order | null;
   buildArea: BuildArea;
   timeRemaining: number;
   feedback: OrderResult | null;
-  gamePhase: "menu" | "playing" | "round_end" | "shop";
+  gamePhase: GamePhase;
+  perfectOrders: number;
 };
+
+// API types
+export type OrderResponse = Order;
+
+export type SubmitRequest = {
+  orderId: string;
+  placedComponents: { instanceId: string; componentType: string }[];
+  timeRemaining: number;
+};
+
+export type SubmitResponse = OrderResult;
 ```
 
 ---
@@ -253,34 +288,42 @@ export type GameState = {
 
 ```
 app/
-├── page.tsx                    # Main game UI
-├── layout.tsx
-├── globals.css
+├── page.tsx                    # Main game UI (menu, playing, round_end states)
+├── layout.tsx                  # Root layout with metadata
+├── globals.css                 # Tailwind + custom styles
+├── favicon.ico
 └── api/
     ├── order/route.ts          # POST - generates new order
     ├── submit/route.ts         # POST - validates and scores order
     └── reset/route.ts          # POST - resets game state
 
 lib/
-├── types.ts                    # TypeScript types
-├── components-data.ts          # DO component definitions
-├── customers-data.ts           # Customer profiles
-├── order-generator.ts          # Random order generation
+├── types.ts                    # TypeScript types (all game types)
+├── components-data.ts          # DO component definitions (20 components)
+├── customers-data.ts           # Customer profiles (12 customers)
+├── order-generator.ts          # Random order generation (12 scenarios)
 ├── terraform-generator.ts      # Generate TF code from components
-└── scoring.ts                  # Calculate cash/accuracy
+└── scoring.ts                  # Calculate cash/accuracy/tips
 
 components/
-├── OrderTicket.tsx             # Customer order display
-├── ComponentPalette.tsx        # Draggable components sidebar
+├── OrderTicket.tsx             # Customer order display with requirements
+├── ComponentPalette.tsx        # Categorized component sidebar
 ├── BuildArea.tsx               # Drop zone for building
-├── TerraformPreview.tsx        # Live TF code display
-├── CashDisplay.tsx             # Current cash
-├── Timer.tsx                   # Countdown timer
-├── CustomerAvatar.tsx          # Customer display
-├── FeedbackBanner.tsx          # Order result
-├── RoundEnd.tsx                # End of round screen
-└── Shop.tsx                    # Upgrades (placeholder)
+├── TerraformPreview.tsx        # Live TF code display with syntax highlighting
+├── CashDisplay.tsx             # Current cash with formatting
+├── Timer.tsx                   # Countdown timer with visual indicator
+├── FeedbackBanner.tsx          # Order result display
+└── RoundEnd.tsx                # End of round screen with stats
+
+docs/
+├── SPEC.md                     # This specification
+├── IMPLEMENTATION_STATUS.md    # What's done vs needs work
+└── DIGITALOCEAN_SETUP.md       # Deployment instructions
 ```
+
+### Not Yet Implemented
+- `components/Shop.tsx` - Upgrade shop (P2 feature)
+- `components/CustomerAvatar.tsx` - Standalone customer display (merged into OrderTicket)
 
 ---
 
@@ -439,20 +482,41 @@ resource "digitalocean_loadbalancer" "chat_lb" {
 
 ## 10) Scoring System
 
-### Base Calculation
+### Calculation (Implemented in `lib/scoring.ts`)
 ```
-Base Reward = Order base value ($200-$800)
-Accuracy Multiplier = Components matched / Components required
-Time Bonus = (timeRemaining / totalTime) * 0.25 * baseReward
-Tip = (accuracy == 100%) ? baseReward * customer.tipMultiplier - baseReward : 0
+Base Reward = Order base value ($200-$650)
 
-Total = (baseReward * accuracyMultiplier) + timeBonus + tip
+Perfect Order (no missing, no extra):
+  Cash = baseReward + timeBonus + tip
+  timeBonus = (timeRemaining / totalTime) * 0.25 * baseReward
+  tip = baseReward * (customer.tipMultiplier - 1)
+
+All Required Present, But Extras:
+  Cash = baseReward * (1 - 0.05 * numExtras)
+  No tip
+
+Partial (≥50% accuracy):
+  Cash = baseReward * (accuracy / 100)
+  No tip
+
+Failed (<50% accuracy):
+  Cash = 0
+  
+Timeout:
+  Cash = 0
 ```
 
-### Penalties
-- Missing component: -20% per missing
-- Extra unnecessary component: -5% per extra
-- Timeout: 0 cash, order fails
+### Accuracy Calculation
+```
+correctlyPlaced = totalRequired - missingCount
+accuracy = (correctlyPlaced / totalRequired) * 100
+```
+
+### Key Values
+- Base rewards: $200 (static site) to $650 (video streaming)
+- Time bonus: Up to 25% of base reward
+- Extra penalty: 5% per unnecessary component
+- Tip multipliers: 1.0x to 1.5x (customer dependent)
 
 ---
 
@@ -531,49 +595,81 @@ Total = (baseReward * accuracyMultiplier) + timeBonus + tip
 
 ## 13) Implementation Notes
 
-### Drag and Drop
-- Use native HTML5 drag and drop or react-dnd
-- Components can be dragged from palette to build area
-- Click to remove from build area
-- Visual feedback on valid drop zones
+### Component Interaction (Current)
+- Click-to-add from palette to build area
+- Click-to-remove from build area
+- No drag-and-drop currently (could be added with react-dnd)
 
-### Real-time Terraform
-- Update TF code on every component add/remove
-- Syntax highlighting with CSS
-- Collapse/expand toggle
+### Real-time Terraform (Implemented)
+- Updates on every component add/remove
+- Uses `terraformConfig` from component definitions
+- Groups resources by type with proper naming
+- Includes customer/order context in comments
 
 ### Responsive Design
-- Desktop-first (drag-drop works best)
-- Mobile: tap-to-add instead of drag
+- Desktop-optimized layout (4-column grid)
+- Mobile: Single column layout with tap-to-add
+- Dark theme with cyan/blue/purple gradients
+
+### State Management
+- All game state in `app/page.tsx` using React hooks
+- No external state library (keep it simple for hackathon)
+- API routes are stateless (order counter resets on server restart)
 
 ---
 
-## 14) Setup Commands
+## 14) Development Commands
 
 ```bash
-npx create-next-app@latest papas-do-eria --typescript --tailwind --app --eslint
-cd papas-do-eria
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Lint code
+npm run lint
 ```
 
 ---
 
 ## 15) Deployment
 
-Push to GitHub. Connect repo to DO App Platform.
+See `docs/DIGITALOCEAN_SETUP.md` for detailed instructions.
 
-**Build command:** `npm run build`  
-**Run command:** `npm start`  
-**Port:** 3000
+### Quick Deploy to DO App Platform
+1. Push to GitHub
+2. Connect repo to DO App Platform
+3. Configure:
+   - **Build command:** `npm run build`
+   - **Run command:** `npm start`
+   - **Port:** 3000
+   - **Environment:** Node.js
 
 ---
 
-## 16) Stretch Goals (Priority Order)
+## 16) Remaining Work & Stretch Goals
 
-1. Sound effects (cash register, component placement)
-2. Animations (component slide, cash pop)
-3. Real customer logos (with permission)
-4. Leaderboard
-5. More order scenarios
-6. Functional shop with upgrades
-7. Difficulty levels
+### P1 - Should Complete (Polish)
+1. Mobile-friendly tap interactions
+2. Visual feedback for matched/missing components during build
+3. Better component count display in build area
+4. Improved accessibility (keyboard navigation)
+
+### P2 - Nice to Have (Time Permitting)
+1. Sound effects (cash register, component drop)
+2. Animations (component slide, cash increment)
+3. Shop system with upgrades (more time, hints, auto-complete)
+
+### P3 - Stretch Goals (Post-Hackathon)
+1. Leaderboard with persistent scores
+2. Difficulty levels (more/fewer components, shorter timers)
+3. Real company logos (with permission)
+4. Additional order scenarios
+5. Tutorial mode for new players
