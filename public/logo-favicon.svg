@@ -1,0 +1,32 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cloudGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#60a5fa;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="url(#cloudGradient)" opacity="0.2"/>
+  
+  <!-- Main cloud -->
+  <ellipse cx="25" cy="28" rx="12" ry="10" fill="url(#cloudGradient)" filter="url(#glow)"/>
+  <ellipse cx="32" cy="24" rx="14" ry="12" fill="url(#cloudGradient)" filter="url(#glow)"/>
+  <ellipse cx="39" cy="28" rx="10" ry="8" fill="url(#cloudGradient)" filter="url(#glow)"/>
+  
+  <!-- Lightning bolt -->
+  <path d="M 32 18 L 36 26 L 34 26 L 38 38 L 28 30 L 32 30 Z" fill="#fbbf24" filter="url(#glow)" opacity="0.9"/>
+  
+  <!-- Rain drops -->
+  <path d="M 24 38 L 25 42 L 24 42 Z" fill="#60a5fa" opacity="0.8"/>
+  <path d="M 32 40 L 33 44 L 32 44 Z" fill="#60a5fa" opacity="0.8"/>
+  <path d="M 40 38 L 41 42 L 40 42 Z" fill="#60a5fa" opacity="0.8"/>
+</svg>

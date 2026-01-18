@@ -1,0 +1,50 @@
+<svg width="400" height="120" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e3a8a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cloudGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#60a5fa;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Icon on the left -->
+  <g transform="translate(20, 20)">
+    <!-- Cloud -->
+    <ellipse cx="25" cy="30" rx="18" ry="15" fill="url(#cloudGradient)" filter="url(#glow)"/>
+    <ellipse cx="40" cy="25" rx="20" ry="18" fill="url(#cloudGradient)" filter="url(#glow)"/>
+    <ellipse cx="50" cy="30" rx="15" ry="12" fill="url(#cloudGradient)" filter="url(#glow)"/>
+    
+    <!-- Lightning -->
+    <path d="M 40 15 L 45 25 L 42 25 L 48 40 L 35 28 L 40 28 Z" fill="#fbbf24" filter="url(#glow)" opacity="0.9"/>
+    
+    <!-- Rain drops -->
+    <path d="M 30 50 L 32 58 L 30 58 Z" fill="#60a5fa" opacity="0.8"/>
+    <path d="M 40 52 L 42 60 L 40 60 Z" fill="#60a5fa" opacity="0.8"/>
+    <path d="M 50 50 L 52 58 L 50 58 Z" fill="#60a5fa" opacity="0.8"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="90" y="50" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="url(#textGradient)">
+    RAIN
+  </text>
+  <text x="90" y="85" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="url(#textGradient)">
+    MAKER
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="90" y="105" font-family="Arial, sans-serif" font-size="12" fill="#94a3b8" opacity="0.8">
+    Infrastructure as Clouds
+  </text>
+</svg>
