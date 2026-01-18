@@ -15,9 +15,9 @@
 
 ### Implementation Priorities
 
-1. **P0 (Must Have):** Working game loop, component selection, scoring, terraform preview
+1. **P0 (Must Have):** Working game loop, component selection, scoring, terraform preview ✅
 2. **P1 (Should Have):** Visual polish, better feedback, mobile support  
-3. **P2 (Nice to Have):** Sound effects, animations, shop system
+3. **P2 (Nice to Have):** Sound effects, animations, shop system ✅ (shop done)
 4. **P3 (Stretch):** Leaderboard, difficulty levels
 
 ### Related Docs
@@ -281,6 +281,14 @@ export type OrderResult = {
 // Game phases
 export type GamePhase = "menu" | "playing" | "feedback" | "round_end" | "shop";
 
+// Shop upgrades state
+export type ShopState = {
+  timeBonusLevel: number;      // 0-3, +10s per order per level
+  tipMultiplierLevel: number;  // 0-3, +20% tips per level
+  autoCompleteLevel: number;   // 0-2, auto-fills N component types
+  premiumOrdersUnlocked: boolean; // Unlocks higher-reward orders
+};
+
 // Game state
 export type GameState = {
   cash: number;
@@ -293,6 +301,7 @@ export type GameState = {
   feedback: OrderResult | null;
   gamePhase: GamePhase;
   perfectOrders: number;
+  shopState: ShopState;
 };
 
 // API types
@@ -334,21 +343,27 @@ components/
 ├── OrderTicket.tsx             # Customer order display with requirements
 ├── ComponentPalette.tsx        # Categorized component sidebar
 ├── BuildArea.tsx               # Drop zone for building
-├── TerraformPreview.tsx        # Live TF code display with syntax highlighting
+├── TerraformPreview.tsx        # Live TF code display with demo mode toggle
 ├── CashDisplay.tsx             # Current cash with formatting
 ├── Timer.tsx                   # Countdown timer with visual indicator
 ├── FeedbackBanner.tsx          # Order result display
-└── RoundEnd.tsx                # End of round screen with stats
+├── RoundEnd.tsx                # End of round screen with stats + shop button
+└── Shop.tsx                    # Upgrade shop with 4 purchasable upgrades
+
+scripts/
+├── raincloud.sh                # Creates demo folder + main.tf for droplet
+├── makeitrain.sh               # Runs terraform init && apply
+└── cleanup.sh                  # Destroys all demo resources + folders
 
 docs/
 ├── SPEC.md                     # This specification
 ├── IMPLEMENTATION_STATUS.md    # What's done vs needs work
-└── DIGITALOCEAN_SETUP.md       # Deployment instructions
+├── DIGITALOCEAN_SETUP.md       # Deployment instructions
+└── TERRAFORM_QUICK_REFERENCE.md # Shell scripts setup and demo workflow
 ```
 
 ### Not Yet Implemented
 
-- `components/Shop.tsx` - Upgrade shop (P2 feature)
 - `components/CustomerAvatar.tsx` - Standalone customer display (merged into OrderTicket)
 
 ---
@@ -464,6 +479,7 @@ To use production-ready specs, modify `lib/terraform-generator.ts` and update th
 ### Demo Mode Toggle
 
 The Terraform Preview includes a **Demo Mode** toggle that filters components to only include resources that are:
+
 - On-demand pricing (billed hourly, can be destroyed immediately)
 - Quick to provision (seconds to minutes, not 5-10 minutes)
 - No extra credentials required (just the DO API token)
@@ -665,6 +681,8 @@ accuracy = (correctlyPlaced / totalRequired) * 100
 
 ## 12) Round End / Shop Screen
 
+### Round End Screen
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         ROUND COMPLETE!                         │
@@ -677,19 +695,51 @@ accuracy = (correctlyPlaced / totalRequired) * 100
 │  │                    💰 TOTAL CASH: $2,450                 │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │                   🏪 SHOP (Coming Soon!)                 │   │
-│  │                                                         │   │
-│  │   Upgrades will be available in a future update:        │   │
-│  │   • Faster dragging                                     │   │
-│  │   • More time per order                                 │   │
-│  │   • Auto-complete hints                                 │   │
-│  │   • Unlock premium customers                            │   │
-│  └─────────────────────────────────────────────────────────┘   │
-│                                                                 │
-│                    [ 🎮 NEXT ROUND ]                            │
+│            [ 🏪 VISIT SHOP ]    [ 🎮 NEXT ROUND ]               │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+### Shop Screen (Implemented)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  🏪 PAPA'S SHOP                              💰 $2,450          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  ⏱️ TIME BONUS                                  $300      │  │
+│  │  +10 seconds per order (Level 1/3)              [BUY]     │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  💰 TIP MULTIPLIER                              $400      │  │
+│  │  +20% tip bonus (Level 0/3)                     [BUY]     │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  ✨ AUTO-COMPLETE                               $600      │  │
+│  │  Auto-fill 1 component type (Level 0/2)         [BUY]     │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  ⭐ PREMIUM ORDERS                              $800      │  │
+│  │  Unlock higher-reward orders                    [BUY]     │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│                      [ 🎮 CONTINUE TO NEXT ROUND ]              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Shop Upgrades
+
+| Upgrade | Max Level | Effect | Base Cost |
+|---------|-----------|--------|-----------|
+| Time Bonus | 3 | +10s per order per level | $300 |
+| Tip Multiplier | 3 | +20% tips per level | $400 |
+| Auto-Complete | 2 | Auto-fills N component types | $600 |
+| Premium Orders | 1 | Unlocks higher-reward orders | $800 |
+
+Upgrade costs scale by 1.5x per level (e.g., Time Bonus: $300 → $450 → $675).
 
 ---
 
@@ -772,7 +822,7 @@ See `docs/DIGITALOCEAN_SETUP.md` for detailed instructions.
 
 1. Sound effects (cash register, component drop)
 2. Animations (component slide, cash increment)
-3. Shop system with upgrades (more time, hints, auto-complete)
+3. ~~Shop system with upgrades (more time, hints, auto-complete)~~ ✅ Done
 
 ### P3 - Stretch Goals (Post-Hackathon)
 
@@ -781,3 +831,63 @@ See `docs/DIGITALOCEAN_SETUP.md` for detailed instructions.
 3. Real company logos (with permission)
 4. Additional order scenarios
 5. Tutorial mode for new players
+
+---
+
+## 17) Shell Scripts for Demo Deployment
+
+Scripts in `scripts/` for deploying Terraform code on a DigitalOcean droplet:
+
+### raincloud.sh
+
+Creates a demo folder and accepts pasted Terraform code.
+
+```bash
+raincloud my-demo
+# Paste terraform code, Ctrl+D
+# Creates ~/my-demo/main.tf
+```
+
+### makeitrain.sh
+
+Runs `terraform init && terraform apply` in current directory.
+
+```bash
+cd ~/my-demo
+makeitrain
+```
+
+### cleanup.sh
+
+Destroys all demo resources and removes folders.
+
+```bash
+cleanup
+# Destroys all ~/demo-*, ~/deploy-*, ~/papa-* directories
+```
+
+### Setup on Ubuntu Droplet
+
+```bash
+# Add raincloud as function (for cd to work)
+cat >> ~/.bashrc << 'EOF'
+raincloud() {
+    NAME="${1:-demo-$(date +%s)}"
+    DIR=~/"$NAME"
+    mkdir -p "$DIR"
+    echo "Paste Terraform code, then Ctrl+D:"
+    cat > "$DIR/main.tf"
+    cd "$DIR"
+    echo "Run 'makeitrain' to deploy"
+}
+EOF
+
+# Create ~/bin and add scripts
+mkdir -p ~/bin
+echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# Copy makeitrain and cleanup scripts (edit to add your DO_TOKEN)
+```
+
+See `TERRAFORM_QUICK_REFERENCE.md` for full setup instructions.
