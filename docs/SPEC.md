@@ -461,6 +461,50 @@ This is intentional for hackathon demos where real infrastructure gets created. 
 
 To use production-ready specs, modify `lib/terraform-generator.ts` and update the size mappings.
 
+### Demo Mode Toggle
+
+The Terraform Preview includes a **Demo Mode** toggle that filters components to only include resources that are:
+- On-demand pricing (billed hourly, can be destroyed immediately)
+- Quick to provision (seconds to minutes, not 5-10 minutes)
+- No extra credentials required (just the DO API token)
+
+#### Included in Demo Mode
+
+| Service | Terraform Resource | Approx. Hourly Cost | Notes |
+|---------|-------------------|---------------------|-------|
+| Droplet (all types) | `digitalocean_droplet` | $0.006-0.125/hr | Provisions in ~1 min |
+| Block Storage | `digitalocean_volume` | $0.0015/hr (10GB) | Instant |
+| Load Balancer | `digitalocean_loadbalancer` | $0.018/hr | ~2 min |
+| VPC | `digitalocean_vpc` | FREE | Instant |
+| Firewall | `digitalocean_firewall` | FREE | Instant |
+| Floating IP | `digitalocean_floating_ip` | FREE (attached) | Instant |
+
+**Estimated demo cost**: 2 droplets + 1 load balancer for 1 hour = ~$0.05
+
+#### Excluded in Demo Mode
+
+| Service | Reason |
+|---------|--------|
+| PostgreSQL, MySQL, Redis, MongoDB | $15/mo minimum, 5-10 min provision |
+| Kubernetes | $12/mo control plane + nodes, slow |
+| Container Registry | Only 1 per account, may conflict |
+| App Platform | Requires git repo |
+| Functions | Requires git repo |
+| Spaces | Requires separate API keys |
+| CDN | Requires Spaces bucket |
+| Monitoring | Requires valid email |
+
+#### Demo Workflow
+
+1. Build infrastructure with any components in the game
+2. Toggle **Demo Mode ON** in Terraform Preview
+3. Excluded components are filtered out automatically
+4. Copy the filtered code
+5. SSH to your Terraform runner droplet
+6. Run `terraform init && terraform apply -var="do_token=$DO_TOKEN"`
+7. Resources created in ~2 minutes
+8. Run `terraform destroy` when done
+
 ### Example Output
 
 ```hcl
