@@ -7,8 +7,10 @@ import {
   DOComponent,
   OrderResult,
   GamePhase,
+  ShopState,
 } from "@/lib/types";
 import { generateTerraformCode } from "@/lib/terraform-generator";
+import { DO_COMPONENTS } from "@/lib/components-data";
 import OrderTicket from "@/components/OrderTicket";
 import ComponentPalette from "@/components/ComponentPalette";
 import BuildArea from "@/components/BuildArea";
@@ -17,6 +19,7 @@ import CashDisplay from "@/components/CashDisplay";
 import Timer from "@/components/Timer";
 import FeedbackBanner from "@/components/FeedbackBanner";
 import RoundEnd from "@/components/RoundEnd";
+import Shop from "@/components/Shop";
 
 const MAX_ORDERS_PER_ROUND = 5;
 
@@ -34,16 +37,33 @@ export default function Home() {
   const [timeRemaining, setTimeRemaining] = useState(60);
   const [feedback, setFeedback] = useState<OrderResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [shopState, setShopState] = useState<ShopState>({
+    timeBonusLevel: 0,
+    tipMultiplierLevel: 0,
+    autoCompleteLevel: 0,
+    premiumOrdersUnlocked: false,
+  });
 
   // Generate terraform code
   const terraformCode = generateTerraformCode(placedComponents, currentOrder);
 
   // Fetch new order
   const fetchOrder = useCallback(async () => {
-    const res = await fetch("/api/order", { method: "POST" });
+    const res = await fetch("/api/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        premiumOrdersUnlocked: shopState.premiumOrdersUnlocked,
+      }),
+    });
     const order: Order = await res.json();
+    
+    // Apply time bonus from shop upgrades
+    const timeBonus = shopState.timeBonusLevel * 10;
+    order.timeLimitSec += timeBonus;
+    
     return order;
-  }, []);
+  }, [shopState.premiumOrdersUnlocked, shopState.timeBonusLevel]);
 
   // Start new game
   const startGame = useCallback(async () => {
@@ -60,23 +80,116 @@ export default function Home() {
     setTimeRemaining(order.timeLimitSec);
     setFeedback(null);
     setGamePhase("playing");
+    setShopState({
+      timeBonusLevel: 0,
+      tipMultiplierLevel: 0,
+      autoCompleteLevel: 0,
+      premiumOrdersUnlocked: false,
+    });
     setIsLoading(false);
   }, [fetchOrder]);
+
+  // Auto-complete helper
+  const applyAutoComplete = useCallback((order: Order) => {
+    if (shopState.autoCompleteLevel === 0) return [];
+    
+    const autoCompleteCount = shopState.autoCompleteLevel;
+    const autoPlaced: PlacedComponent[] = [];
+    
+    // Auto-fill first N unique component types
+    const uniqueTypes = Array.from(new Set(order.requiredComponents.map(rc => rc.componentType)));
+    const typesToAutoFill = uniqueTypes.slice(0, autoCompleteCount);
+    
+    typesToAutoFill.forEach(componentType => {
+      const component = DO_COMPONENTS.find(c => c.type === componentType);
+      if (component) {
+        const requiredQty = order.requiredComponents.find(rc => rc.componentType === componentType)?.quantity || 1;
+        for (let i = 0; i < requiredQty; i++) {
+          autoPlaced.push({
+            instanceId: `auto_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            component,
+          });
+        }
+      }
+    });
+    
+    return autoPlaced;
+  }, [shopState.autoCompleteLevel]);
 
   // Start next round
   const startNextRound = useCallback(async () => {
     setIsLoading(true);
     const order = await fetchOrder();
+    const autoPlaced = applyAutoComplete(order);
     setRound((prev) => prev + 1);
     setOrdersCompleted(0);
     setPerfectOrders(0);
     setCurrentOrder(order);
-    setPlacedComponents([]);
+    setPlacedComponents(autoPlaced);
     setTimeRemaining(order.timeLimitSec);
     setFeedback(null);
     setGamePhase("playing");
     setIsLoading(false);
-  }, [fetchOrder]);
+  }, [fetchOrder, applyAutoComplete]);
+
+  // Handle shop purchase
+  const handleShopPurchase = useCallback((upgradeType: string) => {
+    const getUpgradeCost = (type: string, currentLevel: number): number => {
+      const baseCosts: Record<string, number> = {
+        "time-bonus": 300,
+        "tip-multiplier": 400,
+        "auto-complete": 600,
+        "premium-orders": 800,
+      };
+      return Math.floor(baseCosts[type] * Math.pow(1.5, currentLevel));
+    };
+
+    const newShopState = { ...shopState };
+    let cost = 0;
+
+    switch (upgradeType) {
+      case "time-bonus":
+        if (shopState.timeBonusLevel < 3) {
+          cost = getUpgradeCost(upgradeType, shopState.timeBonusLevel);
+          if (cash >= cost) {
+            newShopState.timeBonusLevel++;
+            setCash(prev => prev - cost);
+            setShopState(newShopState);
+          }
+        }
+        break;
+      case "tip-multiplier":
+        if (shopState.tipMultiplierLevel < 3) {
+          cost = getUpgradeCost(upgradeType, shopState.tipMultiplierLevel);
+          if (cash >= cost) {
+            newShopState.tipMultiplierLevel++;
+            setCash(prev => prev - cost);
+            setShopState(newShopState);
+          }
+        }
+        break;
+      case "auto-complete":
+        if (shopState.autoCompleteLevel < 2) {
+          cost = getUpgradeCost(upgradeType, shopState.autoCompleteLevel);
+          if (cash >= cost) {
+            newShopState.autoCompleteLevel++;
+            setCash(prev => prev - cost);
+            setShopState(newShopState);
+          }
+        }
+        break;
+      case "premium-orders":
+        if (!shopState.premiumOrdersUnlocked) {
+          cost = getUpgradeCost(upgradeType, 0);
+          if (cash >= cost) {
+            newShopState.premiumOrdersUnlocked = true;
+            setCash(prev => prev - cost);
+            setShopState(newShopState);
+          }
+        }
+        break;
+    }
+  }, [cash, shopState]);
 
   // Handle component drop
   const handleComponentDrop = useCallback((component: DOComponent) => {
@@ -112,6 +225,7 @@ export default function Home() {
         })),
         timeRemaining,
         order: currentOrder,
+        tipMultiplierBonus: shopState.tipMultiplierLevel * 0.2,
       }),
     });
 
@@ -129,15 +243,16 @@ export default function Home() {
         setGamePhase("round_end");
       } else {
         const order = await fetchOrder();
+        const autoPlaced = applyAutoComplete(order);
         setCurrentOrder(order);
-        setPlacedComponents([]);
+        setPlacedComponents(autoPlaced);
         setTimeRemaining(order.timeLimitSec);
         setFeedback(null);
         setGamePhase("playing");
       }
       setIsLoading(false);
     }, 2000);
-  }, [currentOrder, gamePhase, placedComponents, timeRemaining, ordersCompleted, fetchOrder]);
+  }, [currentOrder, gamePhase, placedComponents, timeRemaining, ordersCompleted, fetchOrder, applyAutoComplete]);
 
   // Handle timeout
   const handleTimeout = useCallback(async () => {
@@ -160,14 +275,15 @@ export default function Home() {
         setGamePhase("round_end");
       } else {
         const order = await fetchOrder();
+        const autoPlaced = applyAutoComplete(order);
         setCurrentOrder(order);
-        setPlacedComponents([]);
+        setPlacedComponents(autoPlaced);
         setTimeRemaining(order.timeLimitSec);
         setFeedback(null);
         setGamePhase("playing");
       }
     }, 2000);
-  }, [currentOrder, gamePhase, ordersCompleted, fetchOrder]);
+  }, [currentOrder, gamePhase, ordersCompleted, fetchOrder, applyAutoComplete]);
 
   // Timer tick
   const handleTick = useCallback(() => {
@@ -251,6 +367,19 @@ export default function Home() {
         perfectOrders={perfectOrders}
         onNextRound={startNextRound}
         onBackToMenu={() => setGamePhase("menu")}
+        onOpenShop={() => setGamePhase("shop")}
+      />
+    );
+  }
+
+  // Shop screen
+  if (gamePhase === "shop") {
+    return (
+      <Shop
+        cash={cash}
+        shopState={shopState}
+        onPurchase={handleShopPurchase}
+        onContinue={startNextRound}
       />
     );
   }

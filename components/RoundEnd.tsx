@@ -7,6 +7,7 @@ type RoundEndProps = {
   perfectOrders: number;
   onNextRound: () => void;
   onBackToMenu: () => void;
+  onOpenShop: () => void;
 };
 
 export default function RoundEnd({
@@ -16,6 +17,7 @@ export default function RoundEnd({
   perfectOrders,
   onNextRound,
   onBackToMenu,
+  onOpenShop,
 }: RoundEndProps) {
   const rating =
     perfectOrders >= 4 ? "⭐⭐⭐" : perfectOrders >= 2 ? "⭐⭐" : "⭐";
@@ -61,24 +63,21 @@ export default function RoundEnd({
           </p>
         </div>
 
-        {/* Shop Placeholder */}
-        <div className="bg-slate-900/40 rounded-xl p-4 mb-6 border border-slate-700/50">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-xl">🏪</span>
-            <h3 className="text-slate-300 font-bold">SHOP</h3>
-            <span className="text-xs bg-slate-700 text-slate-400 px-2 py-0.5 rounded-full">
-              Coming Soon
-            </span>
+        {/* Shop Button */}
+        <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-4 mb-6 border border-purple-500/30">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className="text-2xl">🏪</span>
+            <h3 className="text-slate-200 font-bold text-lg">UPGRADE SHOP</h3>
           </div>
-          <p className="text-slate-500 text-sm">
-            Upgrades will be available in a future update:
+          <p className="text-slate-400 text-sm mb-4">
+            Invest your earnings to improve your business!
           </p>
-          <ul className="text-slate-600 text-xs mt-2 space-y-1">
-            <li>• Faster drag speed</li>
-            <li>• More time per order</li>
-            <li>• Auto-complete hints</li>
-            <li>• Premium customers</li>
-          </ul>
+          <button
+            onClick={onOpenShop}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-purple-500/25"
+          >
+            🛒 Browse Upgrades
+          </button>
         </div>
 
         {/* Buttons */}

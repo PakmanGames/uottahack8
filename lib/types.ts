@@ -74,6 +74,27 @@ export type OrderResult = {
 // Game phases
 export type GamePhase = "menu" | "playing" | "feedback" | "round_end" | "shop";
 
+// Shop upgrades
+export type UpgradeType = "time-bonus" | "tip-multiplier" | "auto-complete" | "premium-orders";
+
+export type Upgrade = {
+  id: string;
+  type: UpgradeType;
+  name: string;
+  description: string;
+  icon: string;
+  baseCost: number;
+  maxLevel: number;
+  effect: string; // Human-readable effect per level
+};
+
+export type ShopState = {
+  timeBonusLevel: number; // 0-3, each adds +10s
+  tipMultiplierLevel: number; // 0-3, each adds +0.2x
+  autoCompleteLevel: number; // 0-2, auto-fills N components per order
+  premiumOrdersUnlocked: boolean; // One-time purchase
+};
+
 // Game state
 export type GameState = {
   cash: number;
@@ -86,6 +107,7 @@ export type GameState = {
   feedback: OrderResult | null;
   gamePhase: GamePhase;
   perfectOrders: number;
+  shopState: ShopState;
 };
 
 // For API responses

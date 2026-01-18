@@ -200,19 +200,137 @@ const ORDER_SCENARIOS = [
   },
 ];
 
+// Premium orders - harder and more complex, but much higher rewards
+const PREMIUM_ORDER_SCENARIOS = [
+  {
+    id: "enterprise-hybrid-cloud",
+    scenario: "Enterprise Hybrid Cloud",
+    descriptions: [
+      "Build us a full hybrid cloud setup with on-prem integration!",
+      "We need enterprise-grade multi-region infrastructure.",
+      "Set up our global infrastructure with complete redundancy.",
+    ],
+    requiredComponents: [
+      { componentType: "kubernetes", quantity: 2 },
+      { componentType: "droplet-cpu", quantity: 4 },
+      { componentType: "postgres", quantity: 2 },
+      { componentType: "redis", quantity: 2 },
+      { componentType: "load-balancer", quantity: 2 },
+      { componentType: "spaces", quantity: 1 },
+      { componentType: "monitoring", quantity: 1 },
+    ],
+    baseReward: 1200,
+  },
+  {
+    id: "global-cdn-platform",
+    scenario: "Global CDN Platform",
+    descriptions: [
+      "Worldwide content delivery for billions of users!",
+      "Build us a planetary-scale CDN infrastructure.",
+      "We need ultra-low latency content delivery everywhere.",
+    ],
+    requiredComponents: [
+      { componentType: "cdn", quantity: 3 },
+      { componentType: "spaces", quantity: 3 },
+      { componentType: "droplet-general", quantity: 3 },
+      { componentType: "load-balancer", quantity: 2 },
+      { componentType: "redis", quantity: 1 },
+    ],
+    baseReward: 1000,
+  },
+  {
+    id: "ai-training-cluster",
+    scenario: "AI Training Cluster",
+    descriptions: [
+      "Train our foundation models! We need MASSIVE compute.",
+      "Build infrastructure for training GPT-level AI models.",
+      "Set up our AI research cluster with petabytes of storage.",
+    ],
+    requiredComponents: [
+      { componentType: "droplet-cpu", quantity: 5 },
+      { componentType: "droplet-memory", quantity: 3 },
+      { componentType: "block-storage", quantity: 3 },
+      { componentType: "spaces", quantity: 2 },
+      { componentType: "monitoring", quantity: 1 },
+    ],
+    baseReward: 1300,
+  },
+  {
+    id: "financial-trading-platform",
+    scenario: "Financial Trading Platform",
+    descriptions: [
+      "Microseconds matter! Build ultra-low-latency trading infrastructure.",
+      "We need NYSE-grade infrastructure for high-frequency trading.",
+      "Set up our quantitative trading platform with zero downtime.",
+    ],
+    requiredComponents: [
+      { componentType: "droplet-cpu", quantity: 4 },
+      { componentType: "postgres", quantity: 2 },
+      { componentType: "redis", quantity: 3 },
+      { componentType: "load-balancer", quantity: 2 },
+      { componentType: "monitoring", quantity: 1 },
+      { componentType: "vpc", quantity: 1 },
+      { componentType: "firewall", quantity: 1 },
+    ],
+    baseReward: 1400,
+  },
+  {
+    id: "metaverse-platform",
+    scenario: "Metaverse Platform",
+    descriptions: [
+      "Build the infrastructure for the next internet!",
+      "We need real-time 3D rendering for millions of avatars.",
+      "Set up our virtual world with seamless social experiences.",
+    ],
+    requiredComponents: [
+      { componentType: "kubernetes", quantity: 1 },
+      { componentType: "droplet-cpu", quantity: 4 },
+      { componentType: "droplet-memory", quantity: 2 },
+      { componentType: "redis", quantity: 2 },
+      { componentType: "mongodb", quantity: 1 },
+      { componentType: "load-balancer", quantity: 2 },
+      { componentType: "spaces", quantity: 2 },
+    ],
+    baseReward: 1250,
+  },
+  {
+    id: "quantum-computing-gateway",
+    scenario: "Quantum Computing Gateway",
+    descriptions: [
+      "Interface classical systems with quantum computers!",
+      "Build infrastructure to manage quantum algorithm execution.",
+      "We need hybrid classical-quantum computing infrastructure.",
+    ],
+    requiredComponents: [
+      { componentType: "droplet-memory", quantity: 4 },
+      { componentType: "droplet-cpu", quantity: 3 },
+      { componentType: "postgres", quantity: 1 },
+      { componentType: "redis", quantity: 2 },
+      { componentType: "functions", quantity: 2 },
+      { componentType: "monitoring", quantity: 1 },
+    ],
+    baseReward: 1100,
+  },
+];
+
 let orderCounter = 0;
 
 function randomItem<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export function generateOrder(): Order {
+export function generateOrder(premiumOrdersUnlocked = false): Order {
   orderCounter++;
   const orderId = `order_${String(orderCounter).padStart(3, "0")}`;
 
-  // Pick random customer and scenario
+  // Pick random customer
   const customer = randomItem(CUSTOMERS);
-  const scenario = randomItem(ORDER_SCENARIOS);
+  
+  // 30% chance of premium order if unlocked
+  const usePremium = premiumOrdersUnlocked && Math.random() < 0.3;
+  const scenario = usePremium 
+    ? randomItem(PREMIUM_ORDER_SCENARIOS)
+    : randomItem(ORDER_SCENARIOS);
   const description = randomItem(scenario.descriptions);
 
   // Adjust time based on customer patience and order complexity

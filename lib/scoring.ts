@@ -4,7 +4,8 @@ import { Order, PlacedComponent, OrderResult } from "./types";
 export function scoreOrder(
   order: Order,
   placedComponents: PlacedComponent[],
-  timeRemaining: number
+  timeRemaining: number,
+  tipMultiplierBonus: number = 0
 ): OrderResult {
   // Count placed components by type
   const placedCounts: Record<string, number> = {};
@@ -63,11 +64,15 @@ export function scoreOrder(
     const timeBonus = Math.round((timeRemaining / order.timeLimitSec) * 0.25 * order.baseReward);
     cashEarned += timeBonus;
 
-    // Customer tip for perfect orders
-    tip = Math.round(order.baseReward * (order.customer.tipMultiplier - 1));
+    // Customer tip for perfect orders (includes shop upgrade bonus)
+    const totalTipMultiplier = order.customer.tipMultiplier - 1 + tipMultiplierBonus;
+    tip = Math.round(order.baseReward * totalTipMultiplier);
     cashEarned += tip;
 
-    message = `Perfect infrastructure! ${order.customer.name} is impressed! +$${tip} tip!`;
+    const tipMessage = tipMultiplierBonus > 0 
+      ? ` Enhanced tip: +$${tip}!` 
+      : ` +$${tip} tip!`;
+    message = `Perfect infrastructure! ${order.customer.name} is impressed!${tipMessage}`;
   } else if (missing.length === 0 && extra.length > 0) {
     // All required present, but extras
     success = true;

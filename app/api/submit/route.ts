@@ -12,10 +12,11 @@ export function setCurrentOrder(order: Order) {
 }
 
 export async function POST(request: Request) {
-  const body: SubmitRequest & { order: Order } = await request.json();
+  const body: SubmitRequest & { order: Order; tipMultiplierBonus?: number } = await request.json();
 
   // Use the order from the request (client sends it)
   const order = body.order;
+  const tipMultiplierBonus = body.tipMultiplierBonus || 0;
 
   if (!order) {
     return NextResponse.json(
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     })
     .filter((p): p is PlacedComponent => p !== null);
 
-  const result = scoreOrder(order, placedComponents, body.timeRemaining);
+  const result = scoreOrder(order, placedComponents, body.timeRemaining, tipMultiplierBonus);
 
   return NextResponse.json(result);
 }
