@@ -23,10 +23,14 @@ export default function OrderTicket({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div
-            className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+            className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden"
             style={{ backgroundColor: `${order.customer.color}20` }}
           >
-            {order.customer.logo}
+            <img 
+              src={order.customer.logo} 
+              alt={order.customer.name} 
+              className="w-8 h-8 object-contain"
+            />
           </div>
           <div>
             <h2

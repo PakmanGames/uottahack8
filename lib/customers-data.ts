@@ -1,11 +1,12 @@
 // lib/customers-data.ts
 import { Customer } from "./types";
+import { COMPANY_LOGOS } from "./assets";
 
 export const CUSTOMERS: Customer[] = [
   {
     id: "amd",
     name: "AMD",
-    logo: "🔺",
+    logo: COMPANY_LOGOS.amd,
     color: "#ED1C24",
     patience: 3,
     tipMultiplier: 1.2,
@@ -14,7 +15,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "amazon",
     name: "Amazon",
-    logo: "📦",
+    logo: COMPANY_LOGOS.amazon,
     color: "#FF9900",
     patience: 2,
     tipMultiplier: 1.0,
@@ -23,7 +24,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "meta",
     name: "Meta",
-    logo: "Ⓜ️",
+    logo: COMPANY_LOGOS.meta,
     color: "#0668E1",
     patience: 4,
     tipMultiplier: 1.5,
@@ -32,7 +33,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "netflix",
     name: "Netflix",
-    logo: "🎬",
+    logo: COMPANY_LOGOS.netflix,
     color: "#E50914",
     patience: 3,
     tipMultiplier: 1.3,
@@ -41,7 +42,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "spotify",
     name: "Spotify",
-    logo: "🎵",
+    logo: COMPANY_LOGOS.spotify,
     color: "#1DB954",
     patience: 4,
     tipMultiplier: 1.4,
@@ -50,7 +51,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "shopify",
     name: "Shopify",
-    logo: "🛒",
+    logo: COMPANY_LOGOS.shopify,
     color: "#96BF48",
     patience: 3,
     tipMultiplier: 1.2,
@@ -59,7 +60,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "stripe",
     name: "Stripe",
-    logo: "💳",
+    logo: COMPANY_LOGOS.stripe,
     color: "#635BFF",
     patience: 2,
     tipMultiplier: 1.1,
@@ -68,7 +69,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "uber",
     name: "Uber",
-    logo: "🚗",
+    logo: COMPANY_LOGOS.uber,
     color: "#000000",
     patience: 2,
     tipMultiplier: 1.0,
@@ -77,7 +78,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "airbnb",
     name: "Airbnb",
-    logo: "🏠",
+    logo: COMPANY_LOGOS.airbnb,
     color: "#FF5A5F",
     patience: 4,
     tipMultiplier: 1.3,
@@ -86,7 +87,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "slack",
     name: "Slack",
-    logo: "💬",
+    logo: COMPANY_LOGOS.slack,
     color: "#4A154B",
     patience: 3,
     tipMultiplier: 1.2,
@@ -95,7 +96,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "discord",
     name: "Discord",
-    logo: "🎮",
+    logo: COMPANY_LOGOS.discord,
     color: "#5865F2",
     patience: 3,
     tipMultiplier: 1.3,
@@ -104,7 +105,7 @@ export const CUSTOMERS: Customer[] = [
   {
     id: "twitch",
     name: "Twitch",
-    logo: "📺",
+    logo: COMPANY_LOGOS.twitch || "📺",
     color: "#9146FF",
     patience: 2,
     tipMultiplier: 1.2,
