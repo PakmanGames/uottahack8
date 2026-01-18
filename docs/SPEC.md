@@ -14,12 +14,14 @@
 **Priority:** Core gameplay loop > Polish > Stretch features
 
 ### Implementation Priorities
+
 1. **P0 (Must Have):** Working game loop, component selection, scoring, terraform preview
 2. **P1 (Should Have):** Visual polish, better feedback, mobile support  
 3. **P2 (Nice to Have):** Sound effects, animations, shop system
 4. **P3 (Stretch):** Leaderboard, difficulty levels
 
 ### Related Docs
+
 - **`IMPLEMENTATION_STATUS.md`** - What's done vs needs work (check this first!)
 - **`DIGITALOCEAN_SETUP.md`** - Deployment instructions
 
@@ -30,6 +32,7 @@
 Players run a cloud infrastructure shop where enterprise customers (AMD, Amazon, Meta, Netflix, Spotify, etc.) order cloud configurations for their software engineering needs. Players drag-and-drop DigitalOcean components to fulfill orders, then submit to earn cash.
 
 ### Core Loop
+
 ```
 MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → SUBMIT_ORDER → EARN_CASH → NEXT_CUSTOMER → (repeat x5) → ROUND_END → VIEW_EARNINGS → NEXT_ROUND
 ```
@@ -39,6 +42,7 @@ MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → 
 ## 2) Acceptance Criteria
 
 ### Core Gameplay (P0)
+
 - [x] Enterprise customers arrive with infrastructure requests
 - [x] Orders display required components visually
 - [x] Player clicks/drags DO components to a build area
@@ -51,12 +55,14 @@ MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → 
 - [x] Menu screen with game instructions
 
 ### Polish & UX (P1)
+
 - [x] Feedback banner shows order result
 - [x] Components organized by category in palette
 - [ ] Mobile-friendly tap-to-add interaction
 - [ ] Visual indicators for matched/missing components
 
 ### Deployment (P0)
+
 - [ ] Deployed on DO App Platform
 
 ---
@@ -64,6 +70,7 @@ MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → 
 ## 3) DigitalOcean Components (Draggable Items)
 
 ### Compute
+
 | Component | Icon | Base Cost | Description |
 |-----------|------|-----------|-------------|
 | Droplet (Basic) | 💧 | $5/mo | 1 vCPU, 1GB RAM |
@@ -74,6 +81,7 @@ MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → 
 | Kubernetes Cluster | ☸️ | $50/mo | Managed K8s |
 
 ### Storage & Database
+
 | Component | Icon | Base Cost | Description |
 |-----------|------|-----------|-------------|
 | Spaces (Object Storage) | 📁 | $5/mo | 250GB storage |
@@ -84,6 +92,7 @@ MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → 
 | Block Storage | 💾 | $10/mo | 100GB volume |
 
 ### Networking
+
 | Component | Icon | Base Cost | Description |
 |-----------|------|-----------|-------------|
 | Load Balancer | ⚖️ | $12/mo | Traffic distribution |
@@ -93,6 +102,7 @@ MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → 
 | Firewall | 🛡️ | $0/mo | Security rules |
 
 ### Other
+
 | Component | Icon | Base Cost | Description |
 |-----------|------|-----------|-------------|
 | Container Registry | 📋 | $5/mo | Docker images |
@@ -104,6 +114,7 @@ MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → 
 ## 4) Enterprise Customers
 
 ### Customer Profiles
+
 ```typescript
 type Customer = {
   id: string;
@@ -117,6 +128,7 @@ type Customer = {
 ```
 
 ### Customer List (12 customers implemented)
+
 | Customer | Logo | Color | Patience | Tip | Personality |
 |----------|------|-------|----------|-----|-------------|
 | AMD | 🔺 | #ED1C24 | 3 | 1.2x | Technical, precise |
@@ -137,42 +149,55 @@ type Customer = {
 ## 5) Order Types (Software Engineering Scenarios)
 
 ### Order Categories
+
 Orders are real software engineering infrastructure needs. Each scenario has multiple description variants for variety. **12 scenarios implemented:**
 
 #### 1. Web Application Stack ($400 base)
+
 - **Required**: 2x Droplet (General), 1x Load Balancer, 1x PostgreSQL, 1x Spaces
 
 #### 2. Microservices Platform ($500 base)
+
 - **Required**: 1x Kubernetes, 1x Container Registry, 1x Redis, 1x Load Balancer
 
 #### 3. Data Pipeline ($550 base)
+
 - **Required**: 3x Droplet (CPU), 1x MongoDB, 1x Redis, 1x Block Storage
 
 #### 4. Static Website with CDN ($200 base)
+
 - **Required**: 1x Spaces, 1x CDN, 1x Floating IP
 
 #### 5. API Backend ($450 base)
+
 - **Required**: 2x Droplet (General), 1x PostgreSQL, 1x Redis, 1x Load Balancer
 
 #### 6. Machine Learning Platform ($600 base)
+
 - **Required**: 2x Droplet (CPU), 1x Droplet (Memory), 1x Block Storage, 1x Spaces
 
 #### 7. E-commerce Platform ($550 base)
+
 - **Required**: 2x Droplet (General), 1x PostgreSQL, 1x Redis, 1x Load Balancer, 1x Spaces
 
 #### 8. Real-time Chat System ($500 base)
+
 - **Required**: 2x Droplet (Memory), 1x Redis, 1x MongoDB, 1x Load Balancer
 
 #### 9. CI/CD Pipeline ($350 base)
+
 - **Required**: 1x Droplet (General), 1x Container Registry, 1x Spaces, 1x Functions
 
 #### 10. Gaming Backend ($600 base)
+
 - **Required**: 3x Droplet (CPU), 1x Redis, 1x PostgreSQL, 1x Load Balancer
 
 #### 11. Video Streaming Platform ($650 base)
+
 - **Required**: 2x Droplet (CPU), 1x Spaces, 1x CDN, 1x Load Balancer, 1x Redis
 
 #### 12. IoT Platform ($500 base)
+
 - **Required**: 2x Droplet (General), 1x MongoDB, 1x Redis, 1x Functions, 1x Monitoring
 
 ---
@@ -322,6 +347,7 @@ docs/
 ```
 
 ### Not Yet Implemented
+
 - `components/Shop.tsx` - Upgrade shop (P2 feature)
 - `components/CustomerAvatar.tsx` - Standalone customer display (merged into OrderTicket)
 
@@ -330,9 +356,11 @@ docs/
 ## 8) API Contracts
 
 ### POST `/api/order`
+
 Generates a new random order for current round.
 
 **Response:**
+
 ```json
 {
   "orderId": "order_001",
@@ -358,9 +386,11 @@ Generates a new random order for current round.
 ```
 
 ### POST `/api/submit`
+
 Validates player's build against order requirements.
 
 **Request:**
+
 ```json
 {
   "orderId": "order_001",
@@ -376,6 +406,7 @@ Validates player's build against order requirements.
 ```
 
 **Response (success):**
+
 ```json
 {
   "success": true,
@@ -389,6 +420,7 @@ Validates player's build against order requirements.
 ```
 
 **Response (partial):**
+
 ```json
 {
   "success": true,
@@ -402,13 +434,78 @@ Validates player's build against order requirements.
 ```
 
 ### POST `/api/reset`
+
 Resets game to initial state.
 
 ---
 
 ## 9) Terraform Generation
 
-As players add components, generate real Terraform code:
+As players add components, generate real Terraform code.
+
+### Budget Mode (Default)
+
+**Important:** The Terraform code uses **minimal/budget-friendly specs** for demos, while the game UI displays the "ideal" specs for educational purposes. This keeps demo costs low.
+
+| Component | UI Display | Terraform Actual | Reason |
+|-----------|------------|------------------|--------|
+| Droplet (Basic) | 1 vCPU, 1GB | `s-1vcpu-512mb-10gb` ($4/mo) | Smallest available |
+| Droplet (General) | 2 vCPU, 4GB | `s-1vcpu-1gb` ($6/mo) | Budget alternative |
+| Droplet (CPU) | 4 vCPU, 8GB | `c-2` ($42/mo) | Smallest CPU-optimized |
+| Droplet (Memory) | 2 vCPU, 16GB | `m-16gb` ($84/mo) | Smallest memory-optimized |
+| Kubernetes | 3 nodes | 1 node, `s-1vcpu-2gb` | Demo-sized cluster |
+| Block Storage | 100GB | 10GB ($1/mo) | Minimum size |
+| Databases | 1 vCPU, 1GB | `db-s-1vcpu-1gb` | Already smallest |
+
+This is intentional for hackathon demos where real infrastructure gets created. The game teaches the *concepts* of infrastructure sizing while keeping actual deployment costs manageable.
+
+To use production-ready specs, modify `lib/terraform-generator.ts` and update the size mappings.
+
+### Demo Mode Toggle
+
+The Terraform Preview includes a **Demo Mode** toggle that filters components to only include resources that are:
+- On-demand pricing (billed hourly, can be destroyed immediately)
+- Quick to provision (seconds to minutes, not 5-10 minutes)
+- No extra credentials required (just the DO API token)
+
+#### Included in Demo Mode
+
+| Service | Terraform Resource | Approx. Hourly Cost | Notes |
+|---------|-------------------|---------------------|-------|
+| Droplet (all types) | `digitalocean_droplet` | $0.006-0.125/hr | Provisions in ~1 min |
+| Block Storage | `digitalocean_volume` | $0.0015/hr (10GB) | Instant |
+| Load Balancer | `digitalocean_loadbalancer` | $0.018/hr | ~2 min |
+| VPC | `digitalocean_vpc` | FREE | Instant |
+| Firewall | `digitalocean_firewall` | FREE | Instant |
+| Floating IP | `digitalocean_floating_ip` | FREE (attached) | Instant |
+
+**Estimated demo cost**: 2 droplets + 1 load balancer for 1 hour = ~$0.05
+
+#### Excluded in Demo Mode
+
+| Service | Reason |
+|---------|--------|
+| PostgreSQL, MySQL, Redis, MongoDB | $15/mo minimum, 5-10 min provision |
+| Kubernetes | $12/mo control plane + nodes, slow |
+| Container Registry | Only 1 per account, may conflict |
+| App Platform | Requires git repo |
+| Functions | Requires git repo |
+| Spaces | Requires separate API keys |
+| CDN | Requires Spaces bucket |
+| Monitoring | Requires valid email |
+
+#### Demo Workflow
+
+1. Build infrastructure with any components in the game
+2. Toggle **Demo Mode ON** in Terraform Preview
+3. Excluded components are filtered out automatically
+4. Copy the filtered code
+5. SSH to your Terraform runner droplet
+6. Run `terraform init && terraform apply -var="do_token=$DO_TOKEN"`
+7. Resources created in ~2 minutes
+8. Run `terraform destroy` when done
+
+### Example Output
 
 ```hcl
 # Generated by Papa's DO-eria
@@ -483,6 +580,7 @@ resource "digitalocean_loadbalancer" "chat_lb" {
 ## 10) Scoring System
 
 ### Calculation (Implemented in `lib/scoring.ts`)
+
 ```
 Base Reward = Order base value ($200-$650)
 
@@ -507,12 +605,14 @@ Timeout:
 ```
 
 ### Accuracy Calculation
+
 ```
 correctlyPlaced = totalRequired - missingCount
 accuracy = (correctlyPlaced / totalRequired) * 100
 ```
 
 ### Key Values
+
 - Base rewards: $200 (static site) to $650 (video streaming)
 - Time bonus: Up to 25% of base reward
 - Extra penalty: 5% per unnecessary component
@@ -596,22 +696,26 @@ accuracy = (correctlyPlaced / totalRequired) * 100
 ## 13) Implementation Notes
 
 ### Component Interaction (Current)
+
 - Click-to-add from palette to build area
 - Click-to-remove from build area
 - No drag-and-drop currently (could be added with react-dnd)
 
 ### Real-time Terraform (Implemented)
+
 - Updates on every component add/remove
 - Uses `terraformConfig` from component definitions
 - Groups resources by type with proper naming
 - Includes customer/order context in comments
 
 ### Responsive Design
+
 - Desktop-optimized layout (4-column grid)
 - Mobile: Single column layout with tap-to-add
 - Dark theme with cyan/blue/purple gradients
 
 ### State Management
+
 - All game state in `app/page.tsx` using React hooks
 - No external state library (keep it simple for hackathon)
 - API routes are stateless (order counter resets on server restart)
@@ -644,6 +748,7 @@ npm run lint
 See `docs/DIGITALOCEAN_SETUP.md` for detailed instructions.
 
 ### Quick Deploy to DO App Platform
+
 1. Push to GitHub
 2. Connect repo to DO App Platform
 3. Configure:
@@ -657,17 +762,20 @@ See `docs/DIGITALOCEAN_SETUP.md` for detailed instructions.
 ## 16) Remaining Work & Stretch Goals
 
 ### P1 - Should Complete (Polish)
+
 1. Mobile-friendly tap interactions
 2. Visual feedback for matched/missing components during build
 3. Better component count display in build area
 4. Improved accessibility (keyboard navigation)
 
 ### P2 - Nice to Have (Time Permitting)
+
 1. Sound effects (cash register, component drop)
 2. Animations (component slide, cash increment)
 3. Shop system with upgrades (more time, hints, auto-complete)
 
 ### P3 - Stretch Goals (Post-Hackathon)
+
 1. Leaderboard with persistent scores
 2. Difficulty levels (more/fewer components, shorter timers)
 3. Real company logos (with permission)

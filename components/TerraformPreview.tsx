@@ -4,9 +4,17 @@ import { useState } from "react";
 
 type TerraformPreviewProps = {
   code: string;
+  demoMode: boolean;
+  onDemoModeChange: (enabled: boolean) => void;
+  excludedCount?: number;
 };
 
-export default function TerraformPreview({ code }: TerraformPreviewProps) {
+export default function TerraformPreview({
+  code,
+  demoMode,
+  onDemoModeChange,
+  excludedCount = 0,
+}: TerraformPreviewProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Basic syntax highlighting
@@ -62,8 +70,44 @@ export default function TerraformPreview({ code }: TerraformPreviewProps) {
           <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">
             Terraform Preview
           </h3>
+          {demoMode && excludedCount > 0 && (
+            <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full">
+              {excludedCount} excluded
+            </span>
+          )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          {/* Demo Mode Toggle */}
+          <label className="flex items-center gap-2 cursor-pointer group">
+            <span
+              className={`text-xs transition-colors ${
+                demoMode ? "text-emerald-400" : "text-slate-500"
+              }`}
+            >
+              Demo Mode
+            </span>
+            <div className="relative">
+              <input
+                type="checkbox"
+                checked={demoMode}
+                onChange={(e) => onDemoModeChange(e.target.checked)}
+                className="sr-only"
+              />
+              <div
+                className={`w-9 h-5 rounded-full transition-colors ${
+                  demoMode ? "bg-emerald-500" : "bg-slate-600"
+                }`}
+              />
+              <div
+                className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                  demoMode ? "translate-x-4" : "translate-x-0"
+                }`}
+              />
+            </div>
+          </label>
+          
+          <div className="w-px h-4 bg-slate-700" />
+          
           <button
             onClick={() => navigator.clipboard.writeText(code)}
             className="text-xs text-slate-400 hover:text-cyan-400 transition-colors px-2 py-1 rounded hover:bg-slate-700"

@@ -173,56 +173,60 @@ apt-get update && apt-get install -y terraform
 
 ---
 
-## Quick Demo Script
+## Demo Scripts
 
-Save this as `~/deploy.sh` for fast demos:
+Three scripts in `scripts/` for easy demo workflow:
+
+| Script | Purpose |
+|--------|---------|
+| `raincloud.sh` | Create demo folder + paste terraform code |
+| `makeitrain.sh` | Run `terraform init && apply` |
+| `cleanup.sh` | Destroy all resources + delete folders |
+
+### One-Time Setup on Droplet
 
 ```bash
-#!/bin/bash
-set -e
+# Create ~/bin and add to PATH
+mkdir -p ~/bin
+echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 
-if [ -z "$1" ]; then
-  echo "Usage: ./deploy.sh demo-name"
-  exit 1
-fi
+# Copy scripts (replace YOUR_TOKEN in makeitrain and cleanup)
+# See scripts/*.sh for contents
 
-DEMO_DIR=~/demo-$1
-mkdir -p $DEMO_DIR && cd $DEMO_DIR
-
-echo "Paste your Terraform code, then press Ctrl+D when done:"
-cat > main.tf
-
-terraform init
-terraform apply -var="do_token=$DO_TOKEN"
+# For raincloud to cd into the directory, add the function to ~/.bashrc:
+cat >> ~/.bashrc << 'EOF'
+raincloud() {
+    NAME="${1:-demo-$(date +%s)}"
+    DIR=~/"$NAME"
+    mkdir -p "$DIR"
+    echo "📁 Created: $DIR"
+    echo ""
+    echo "Paste your Terraform code, then press Ctrl+D:"
+    cat > "$DIR/main.tf"
+    echo ""
+    echo "✅ Saved to $DIR/main.tf"
+    cd "$DIR"
+    echo "📂 Now in: $(pwd)"
+    echo "Run 'makeitrain' to deploy"
+}
+EOF
+source ~/.bashrc
 ```
 
-Usage:
+### Workflow
 
 ```bash
-chmod +x ~/deploy.sh
-~/deploy.sh my-demo-name
-# Paste code, Ctrl+D
-```
+# Step 1: Create demo and paste code
+raincloud my-demo
+# [paste terraform code, Ctrl+D]
+# Now you're in ~/my-demo
 
----
+# Step 2: Deploy
+makeitrain
 
-## Cleanup Script
-
-Save as `~/cleanup.sh`:
-
-```bash
-#!/bin/bash
-echo "Destroying all demo deployments..."
-
-for dir in ~/demo-* ~/deploy-*; do
-  if [ -d "$dir" ] && [ -f "$dir/terraform.tfstate" ]; then
-    echo "Destroying $dir..."
-    cd "$dir"
-    terraform destroy -var="do_token=$DO_TOKEN" -auto-approve
-  fi
-done
-
-echo "Cleanup complete!"
+# Step 3: When done, cleanup all
+cleanup
 ```
 
 ---
