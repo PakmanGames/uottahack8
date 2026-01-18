@@ -1,6 +1,8 @@
-# Papa's DO-eria - Technical Specification
+# Rain Maker - Technical Specification
 
-> A Papa's Pizzeria-style web game where players build DigitalOcean infrastructure for enterprise customers.  
+> *"Rainy with a chance of rogue tech, infrastructure as clouds (IaC) to make it rain"*
+>
+> A rogue-like web game where players build DigitalOcean infrastructure with Terraform and make it rain!  
 > **Stack:** Next.js 15 (App Router) + Tailwind CSS + TypeScript  
 > **Hosting:** DigitalOcean App Platform  
 > **Mode:** Simulation with Terraform code generation
@@ -16,7 +18,7 @@
 ### Implementation Priorities
 
 1. **P0 (Must Have):** Working game loop, component selection, scoring, terraform preview ✅
-2. **P1 (Should Have):** Visual polish, better feedback, mobile support  
+2. **P1 (Should Have):** Visual polish, better feedback, mobile support ✅ (theme done)
 3. **P2 (Nice to Have):** Sound effects, animations, shop system ✅ (shop done)
 4. **P3 (Stretch):** Leaderboard, difficulty levels
 
@@ -29,12 +31,19 @@
 
 ## 1) Game Concept
 
-Players run a cloud infrastructure shop where enterprise customers (AMD, Amazon, Meta, Netflix, Spotify, etc.) order cloud configurations for their software engineering needs. Players drag-and-drop DigitalOcean components to fulfill orders, then submit to earn cash.
+Players weather the storm as enterprise customers (AMD, Amazon, Meta, Netflix, Spotify, etc.) request cloud configurations for their software engineering needs. Players build cloud infrastructure by dragging-and-dropping DigitalOcean components, generate Terraform code, and "make it rain" with cloud cash!
+
+### Theme
+
+- **Weather/Storm Aesthetic** - Dark storm backgrounds, rain animations, lightning effects
+- **Cloud Infrastructure** - Components are "clouds" forming infrastructure
+- **Rogue-like Elements** - Power-ups between rounds, increasing difficulty
+- **"Make It Rain"** - Success = cash raining down
 
 ### Core Loop
 
 ```
-MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → SUBMIT_ORDER → EARN_CASH → NEXT_CUSTOMER → (repeat x5) → ROUND_END → VIEW_EARNINGS → NEXT_ROUND
+MENU → START_STORM → CUSTOMER_ARRIVES → READ_FORECAST → BUILD_CLOUDS → MAKE_IT_RAIN → EARN_CASH → NEXT_CUSTOMER → (repeat x5) → STORM_END → POWER_UPS → NEXT_STORM
 ```
 
 ---
@@ -58,6 +67,7 @@ MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → 
 
 - [x] Feedback banner shows order result
 - [x] Components organized by category in palette
+- [x] Weather-themed UI with rain effects and storm animations
 - [ ] Mobile-friendly tap-to-add interaction
 - [ ] Visual indicators for matched/missing components
 
@@ -67,7 +77,7 @@ MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → 
 
 ---
 
-## 3) DigitalOcean Components (Draggable Items)
+## 3) DigitalOcean Components (Cloud Components)
 
 ### Compute
 
@@ -119,7 +129,7 @@ MENU → START_GAME → CUSTOMER_ARRIVES → READ_ORDER → DRAG_COMPONENTS → 
 type Customer = {
   id: string;
   name: string;           // "AMD", "Meta", "Netflix"
-  logo: string;           // Emoji icon
+  logo: string;           // SVG logo path
   color: string;          // Brand color (hex)
   patience: number;       // 1-5, affects timer duration
   tipMultiplier: number;  // Bonus multiplier for perfect orders
@@ -146,7 +156,7 @@ type Customer = {
 
 ---
 
-## 5) Order Types (Software Engineering Scenarios)
+## 5) Order Types (Infrastructure Scenarios)
 
 ### Order Categories
 
@@ -281,7 +291,7 @@ export type OrderResult = {
 // Game phases
 export type GamePhase = "menu" | "playing" | "feedback" | "round_end" | "shop";
 
-// Shop upgrades state
+// Shop upgrades state (Power-Ups)
 export type ShopState = {
   timeBonusLevel: number;      // 0-3, +10s per order per level
   tipMultiplierLevel: number;  // 0-3, +20% tips per level
@@ -324,7 +334,7 @@ export type SubmitResponse = OrderResult;
 app/
 ├── page.tsx                    # Main game UI (menu, playing, round_end states)
 ├── layout.tsx                  # Root layout with metadata
-├── globals.css                 # Tailwind + custom styles
+├── globals.css                 # Tailwind + storm theme styles + rain animations
 ├── favicon.ico
 └── api/
     ├── order/route.ts          # POST - generates new order
@@ -340,15 +350,15 @@ lib/
 └── scoring.ts                  # Calculate cash/accuracy/tips
 
 components/
-├── OrderTicket.tsx             # Customer order display with requirements
-├── ComponentPalette.tsx        # Categorized component sidebar
-├── BuildArea.tsx               # Drop zone for building
+├── OrderTicket.tsx             # Customer order display (forecast style)
+├── ComponentPalette.tsx        # Cloud components sidebar
+├── BuildArea.tsx               # Cloud formation zone
 ├── TerraformPreview.tsx        # Live TF code display with demo mode toggle
-├── CashDisplay.tsx             # Current cash with formatting
-├── Timer.tsx                   # Countdown timer with visual indicator
+├── CashDisplay.tsx             # Current cash with rain animation
+├── Timer.tsx                   # Storm countdown timer
 ├── FeedbackBanner.tsx          # Order result display
-├── RoundEnd.tsx                # End of round screen with stats + shop button
-└── Shop.tsx                    # Upgrade shop with 4 purchasable upgrades
+├── RoundEnd.tsx                # End of storm screen with stats + shop button
+└── Shop.tsx                    # Power-up shop with 4 purchasable upgrades
 
 scripts/
 ├── raincloud.sh                # Creates demo folder + main.tf for droplet
@@ -372,7 +382,7 @@ docs/
 
 ### POST `/api/order`
 
-Generates a new random order for current round.
+Generates a new random order for current storm.
 
 **Response:**
 
@@ -382,7 +392,7 @@ Generates a new random order for current round.
   "customer": {
     "id": "netflix",
     "name": "Netflix",
-    "logo": "🎬",
+    "logo": "/logos/netflix.svg",
     "color": "#E50914",
     "patience": 3,
     "tipMultiplier": 1.3
@@ -524,7 +534,7 @@ The Terraform Preview includes a **Demo Mode** toggle that filters components to
 ### Example Output
 
 ```hcl
-# Generated by Papa's DO-eria
+# Generated by Rain Maker
 # Customer: Netflix
 # Order: Real-time Chat System
 
@@ -638,32 +648,45 @@ accuracy = (correctlyPlaced / totalRequired) * 100
 
 ## 11) UI Layout
 
+### Theme Elements
+
+- **Storm Background** - Dark gradient with rain animations
+- **Lightning Flash** - Subtle flash effect for atmosphere
+- **Floating Clouds** - Decorative cloud elements
+- **Rain Drops** - CSS animated rain effect (client-side rendered)
+- **Neon Glow** - Cyan/blue/purple color palette
+
+### Main Game Layout
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  PAPA'S DO-ERIA                               💰 $2,450    ⏱️ 45s           │
+│  🌧️ RAIN MAKER                          ⛈️ Storm 1    💰 $2,450    ⏱️ 45s    │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────────┐│
-│  │  🎬 NETFLIX                                    Order #3/5              ││
+│  │  [LOGO] NETFLIX                              🌧️ Deploy #3/5            ││
+│  │  ☁️ Web Application Stack                                               ││
 │  │  ─────────────────────────────────────────────────────────────────────  ││
+│  │  📡 INCOMING REQUEST                                                    ││
 │  │  "We need WebSocket infrastructure for our new messaging feature!"     ││
 │  │                                                                         ││
-│  │  REQUIRED:  💧💧 x2   🔴 x1   🍃 x1   ⚖️ x1                              ││
+│  │  ⛅ CLOUD INFRASTRUCTURE NEEDED                                         ││
+│  │  💧💧 x2   🔴 x1   🍃 x1   ⚖️ x1                                         ││
 │  └─────────────────────────────────────────────────────────────────────────┘│
 │                                                                             │
 │  ┌───────────────┐  ┌──────────────────────────────────────────────────────┐│
-│  │  COMPONENTS   │  │  BUILD AREA                                          ││
-│  │  ───────────  │  │  ┌────────────────────────────────────────────────┐  ││
-│  │  💧 Droplet   │  │  │  💧💧  🔴  🍃  ⚖️                                │  ││
-│  │  🐘 Postgres  │  │  │                                                │  ││
-│  │  🔴 Redis     │  │  │  [Drag components here]                        │  ││
-│  │  ⚖️ Load Bal  │  │  └────────────────────────────────────────────────┘  ││
-│  │  📁 Spaces    │  │                                                      ││
-│  │  ...         │  │  Monthly Cost: $127/mo                               ││
+│  │ 🌩️ CLOUD      │  │  ☁️ CLOUD FORMATION                      💵 $127/mo  ││
+│  │  COMPONENTS   │  │  ┌────────────────────────────────────────────────┐  ││
+│  │  ───────────  │  │  │  💧💧  🔴  🍃  ⚖️                                │  ││
+│  │  💧 Droplet   │  │  │                                                │  ││
+│  │  🐘 Postgres  │  │  │  [Drop cloud components here]                  │  ││
+│  │  🔴 Redis     │  │  └────────────────────────────────────────────────┘  ││
+│  │  ⚖️ Load Bal  │  │                                                      ││
+│  │  ...          │  │  🌬️ Click a cloud to remove it                       ││
 │  └───────────────┘  └──────────────────────────────────────────────────────┘│
 │                                                                             │
 │  ┌──────────────────────────────────────────────────────────────────┐       │
-│  │  TERRAFORM PREVIEW                                                │       │
+│  │  ☁️ INFRASTRUCTURE CODE                                          │       │
 │  │  ```hcl                                                          │       │
 │  │  resource "digitalocean_droplet" "server_1" {                    │       │
 │  │    image = "ubuntu-22-04-x64"                                    │       │
@@ -672,74 +695,77 @@ accuracy = (correctlyPlaced / totalRequired) * 100
 │  └──────────────────────────────────────────────────────────────────┘       │
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────────┐│
-│  │                        [ 🚀 SUBMIT ORDER ]                              ││
+│  │                        [ 🌧️ MAKE IT RAIN ]                             ││
 │  └─────────────────────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 12) Round End / Shop Screen
+## 12) Storm End / Power-Up Shop
 
-### Round End Screen
+### Storm End Screen
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         ROUND COMPLETE!                         │
+│                       🌧️ STORM 1 COMPLETE!                      │
 │                                                                 │
-│                    Orders Completed: 5/5                        │
-│                    Total Earnings: $2,450                       │
-│                    Perfect Orders: 3                            │
+│                         ⛈️⛈️⛈️                                  │
+│                    Storm Chaser Elite!                          │
+│                                                                 │
+│                    ☁️ Deployments: 5/5                          │
+│                    ⛈️ Perfect Storms: 3                         │
 │                                                                 │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │                    💰 TOTAL CASH: $2,450                 │   │
+│  │          🌧️ TOTAL EARNINGS 💸: $2,450                   │   │
+│  │                You made it rain!                        │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
-│            [ 🏪 VISIT SHOP ]    [ 🎮 NEXT ROUND ]               │
+│            [ ⚡ POWER-UPS ]    [ ⛈️ NEXT STORM → ]              │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Shop Screen (Implemented)
+### Power-Up Shop (Implemented)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  🏪 PAPA'S SHOP                              💰 $2,450          │
+│  ⚡ POWER-UP SHOP                            💰 $2,450          │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │  ⏱️ TIME BONUS                                  $300      │  │
-│  │  +10 seconds per order (Level 1/3)              [BUY]     │  │
+│  │  ⏰ STORM EXTENSION                            $300       │  │
+│  │  More time before the storm passes (Level 1/3) [BUY]     │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │  💰 TIP MULTIPLIER                              $400      │  │
-│  │  +20% tip bonus (Level 0/3)                     [BUY]     │  │
+│  │  ✨ GOLDEN CLOUDS                              $400       │  │
+│  │  Increase bonus earnings (Level 0/3)           [BUY]     │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │  ✨ AUTO-COMPLETE                               $600      │  │
-│  │  Auto-fill 1 component type (Level 0/2)         [BUY]     │  │
+│  │  🤖 CLOUD AUTOMATION                           $600       │  │
+│  │  Auto-spawns starting components (Level 0/2)   [BUY]     │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │  ⭐ PREMIUM ORDERS                              $800      │  │
-│  │  Unlock higher-reward orders                    [BUY]     │  │
+│  │  🌀 HURRICANE MODE                             $800       │  │
+│  │  High-risk, high-reward storms                 [BUY]     │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                                                                 │
-│                      [ 🎮 CONTINUE TO NEXT ROUND ]              │
+│                  [ ⛈️ CONTINUE TO NEXT STORM → ]               │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Shop Upgrades
+### Power-Up Upgrades
 
-| Upgrade | Max Level | Effect | Base Cost |
-|---------|-----------|--------|-----------|
-| Time Bonus | 3 | +10s per order per level | $300 |
-| Tip Multiplier | 3 | +20% tips per level | $400 |
-| Auto-Complete | 2 | Auto-fills N component types | $600 |
-| Premium Orders | 1 | Unlocks higher-reward orders | $800 |
+| Power-Up | Max Level | Effect | Base Cost |
+|----------|-----------|--------|-----------|
+| Storm Extension | 3 | +10s per order per level | $300 |
+| Golden Clouds | 3 | +20% tips per level | $400 |
+| Cloud Automation | 2 | Auto-fills N component types | $600 |
+| Hurricane Mode | 1 | Unlocks higher-reward orders | $800 |
 
-Upgrade costs scale by 1.5x per level (e.g., Time Bonus: $300 → $450 → $675).
+Upgrade costs scale by 1.5x per level (e.g., Storm Extension: $300 → $450 → $675).
 
 ---
 
@@ -749,7 +775,7 @@ Upgrade costs scale by 1.5x per level (e.g., Time Bonus: $300 → $450 → $675)
 
 - Click-to-add from palette to build area
 - Click-to-remove from build area
-- No drag-and-drop currently (could be added with react-dnd)
+- Drag-and-drop also supported
 
 ### Real-time Terraform (Implemented)
 
@@ -762,13 +788,17 @@ Upgrade costs scale by 1.5x per level (e.g., Time Bonus: $300 → $450 → $675)
 
 - Desktop-optimized layout (4-column grid)
 - Mobile: Single column layout with tap-to-add
-- Dark theme with cyan/blue/purple gradients
+- Dark storm theme with cyan/blue/purple gradients
 
 ### State Management
 
 - All game state in `app/page.tsx` using React hooks
 - No external state library (keep it simple for hackathon)
 - API routes are stateless (order counter resets on server restart)
+
+### Rain Animation (Hydration-Safe)
+
+Rain effects use `useEffect` to generate random positions only on the client side, preventing React hydration mismatches.
 
 ---
 
@@ -820,9 +850,10 @@ See `docs/DIGITALOCEAN_SETUP.md` for detailed instructions.
 
 ### P2 - Nice to Have (Time Permitting)
 
-1. Sound effects (cash register, component drop)
-2. Animations (component slide, cash increment)
-3. ~~Shop system with upgrades (more time, hints, auto-complete)~~ ✅ Done
+1. Sound effects (thunder, rain, cash register)
+2. ~~Animations (component slide, cash increment)~~ ✅ Rain animations done
+3. ~~Shop system with upgrades~~ ✅ Done (Power-Ups)
+4. ~~Weather-themed UI~~ ✅ Done
 
 ### P3 - Stretch Goals (Post-Hackathon)
 
@@ -831,6 +862,7 @@ See `docs/DIGITALOCEAN_SETUP.md` for detailed instructions.
 3. Real company logos (with permission)
 4. Additional order scenarios
 5. Tutorial mode for new players
+6. Rogue-like random events ("Packet Loss Fog", "DB Thunderstorm")
 
 ---
 
@@ -863,7 +895,7 @@ Destroys all demo resources and removes folders.
 
 ```bash
 cleanup
-# Destroys all ~/demo-*, ~/deploy-*, ~/papa-* directories
+# Destroys all ~/demo-*, ~/deploy-*, ~/rain-* directories
 ```
 
 ### Setup on Ubuntu Droplet
@@ -891,3 +923,7 @@ source ~/.bashrc
 ```
 
 See `TERRAFORM_QUICK_REFERENCE.md` for full setup instructions.
+
+---
+
+*Built with ⛈️ for uOttaHack8*

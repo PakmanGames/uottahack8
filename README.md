@@ -1,19 +1,23 @@
-# Papa's DO-eria 🎮☁️
+# Rain Maker 🌧️⛈️💰
 
-A Papa's Pizzeria-style web game where players build DigitalOcean infrastructure for enterprise customers!
+> *"Rainy with a chance of rogue tech, infrastructure as clouds (IaC) to make it rain"*
+
+A rogue-like web game where you build DigitalOcean infrastructure with Terraform and make it rain!
 
 ## About
 
-Papa's DO-eria is a fun, educational game that teaches cloud infrastructure concepts. Players run a cloud infrastructure shop where enterprise customers (AMD, Amazon, Meta, Netflix, etc.) order cloud configurations. Drag and drop DigitalOcean components to fulfill orders and earn cash!
+Rain Maker is a fun, educational game that teaches cloud infrastructure concepts with a weather/storm theme. Players weather the storm as enterprise customers (AMD, Amazon, Meta, Netflix, etc.) request cloud configurations. Build cloud infrastructure, generate Terraform code, and make it rain with that sweet cloud cash!
 
 ## Features
 
+- 🌩️ **Weather-Themed Gameplay** - Storm through infrastructure challenges
 - 🏢 **Enterprise Customers** - 12 real tech companies with unique personalities
-- 📦 **20 DO Components** - Droplets, Databases, Load Balancers, Kubernetes, and more
+- ☁️ **20 Cloud Components** - Droplets, Databases, Load Balancers, Kubernetes, and more
 - 📋 **12 Infrastructure Scenarios** - Web apps, microservices, ML platforms, gaming backends
 - 📄 **Real Terraform Code** - See your infrastructure as Terraform HCL in real-time
-- ⏱️ **Time Pressure** - Dynamic timers based on customer patience and order complexity
-- 💰 **Scoring System** - Earn cash based on accuracy, speed, and customer tips
+- ⏱️ **Storm Timers** - Dynamic timers based on customer patience and order complexity
+- 💰 **Make It Rain** - Earn cash based on accuracy, speed, and customer tips
+- ⚡ **Power-Ups** - Rogue-like upgrade shop between rounds
 
 ## Tech Stack
 
@@ -33,8 +37,8 @@ Papa's DO-eria is a fun, educational game that teaches cloud infrastructure conc
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/papas-do-eria.git
-cd papas-do-eria
+git clone https://github.com/yourusername/rain-maker.git
+cd rain-maker
 
 # Install dependencies
 npm install
@@ -43,21 +47,28 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to play!
+Open [http://localhost:3000](http://localhost:3000) to start the storm!
 
-## How to Play
+## How to Make It Rain ☁️💸
 
-1. **Read the Order** - Check what components the customer needs
-2. **Build Infrastructure** - Click components to add them to the build area
-3. **Review Terraform** - Check the live Terraform code preview
-4. **Submit** - Deliver the order and earn cash!
+1. **📡 Read the Forecast** - Check what cloud infrastructure the customer needs
+2. **☁️ Build the Clouds** - Click components to add them to your cloud formation
+3. **📄 Generate Terraform** - Watch your infrastructure code form in real-time
+4. **🌧️ Make It Rain** - Deploy and collect that sweet cloud cash!
 
 ### Scoring
 
 - **Base Reward:** $200-$650 depending on order complexity
 - **Time Bonus:** Up to 25% extra for fast completion
-- **Tips:** Perfect orders earn customer tips (1.0x-1.5x multiplier)
+- **Tips:** Perfect storms earn customer tips (1.0x-1.5x multiplier)
 - **Penalties:** Missing components reduce payment; <50% accuracy = $0
+
+### Power-Ups
+
+- ⏰ **Storm Extension** - More time before the storm passes
+- ✨ **Golden Clouds** - Increase bonus earnings
+- 🤖 **Cloud Automation** - Auto-spawns starting components
+- 🌀 **Hurricane Mode** - Unlock harder storms with bigger payouts
 
 ## Project Structure
 
@@ -81,13 +92,14 @@ lib/
 
 components/
 ├── OrderTicket.tsx             # Customer order display
-├── ComponentPalette.tsx        # Draggable components sidebar
-├── BuildArea.tsx               # Drop zone for building
+├── ComponentPalette.tsx        # Cloud components sidebar
+├── BuildArea.tsx               # Cloud formation zone
 ├── TerraformPreview.tsx        # Live TF code display
 ├── CashDisplay.tsx             # Current cash
-├── Timer.tsx                   # Countdown timer
+├── Timer.tsx                   # Storm countdown timer
 ├── FeedbackBanner.tsx          # Order result
-└── RoundEnd.tsx                # End of round screen
+├── RoundEnd.tsx                # End of storm screen
+└── Shop.tsx                    # Power-up shop
 ```
 
 ## Deployment
@@ -106,7 +118,12 @@ npm start
 - [Technical Specification](docs/SPEC.md)
 - [Implementation Status](docs/IMPLEMENTATION_STATUS.md)
 - [DigitalOcean Setup Guide](docs/DIGITALOCEAN_SETUP.md)
+- [Terraform Quick Reference](docs/TERRAFORM_QUICK_REFERENCE.md)
 
 ## License
 
 MIT
+
+---
+
+*Built with ⛈️ for uOttaHack8*
