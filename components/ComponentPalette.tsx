@@ -29,21 +29,25 @@ export default function ComponentPalette({
   );
 
   return (
-    <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700 rounded-2xl p-4 shadow-xl h-full">
-      <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">
-        Components
+    <div className="cloud-card rounded-2xl p-4 shadow-xl h-full relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute -top-4 -right-4 text-6xl opacity-5 pointer-events-none">⛅</div>
+      
+      <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2 relative z-10">
+        <span>🌩️</span>
+        Cloud Components
       </h3>
 
       {/* Category Tabs */}
-      <div className="flex flex-wrap gap-1 mb-4">
+      <div className="flex flex-wrap gap-1 mb-4 relative z-10">
         {CATEGORIES.map((cat) => (
           <button
             key={cat.id}
             onClick={() => setActiveCategory(cat.id)}
             className={`px-2 py-1 text-xs rounded-lg transition-all ${
               activeCategory === cat.id
-                ? "bg-cyan-600 text-white"
-                : "bg-slate-700/50 text-slate-400 hover:bg-slate-700"
+                ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/20"
+                : "bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-300"
             }`}
           >
             <span className="mr-1">{cat.icon}</span>
@@ -53,7 +57,7 @@ export default function ComponentPalette({
       </div>
 
       {/* Component List */}
-      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 relative z-10">
         {filteredComponents.map((component) => (
           <div
             key={component.id}
@@ -63,7 +67,7 @@ export default function ComponentPalette({
               onDragStart(component);
             }}
             onClick={() => onComponentClick(component)}
-            className="flex items-center gap-3 p-3 bg-slate-900/60 border border-slate-600 rounded-lg cursor-grab active:cursor-grabbing hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all group"
+            className="flex items-center gap-3 p-3 bg-gradient-to-r from-slate-900/80 to-slate-800/60 border border-slate-600/50 rounded-lg cursor-grab active:cursor-grabbing hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all group hover:shadow-lg hover:shadow-cyan-500/10"
           >
             <span className="text-2xl group-hover:scale-110 transition-transform">
               {component.icon}
@@ -83,8 +87,9 @@ export default function ComponentPalette({
         ))}
       </div>
 
-      <p className="text-slate-500 text-xs mt-3 text-center">
-        Drag or click to add
+      <p className="text-slate-500 text-xs mt-3 text-center flex items-center justify-center gap-1 relative z-10">
+        <span>☁️</span>
+        Drag or click to add clouds
       </p>
     </div>
   );

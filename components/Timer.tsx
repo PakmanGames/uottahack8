@@ -33,11 +33,17 @@ export default function Timer({
   }, [timeRemaining, isRunning, onTick, onTimeout]);
 
   const isWarning = timeRemaining <= 15;
+  const isCritical = timeRemaining <= 5;
   const percentage = (timeRemaining / maxTime) * 100;
 
   return (
     <div className="flex items-center gap-3">
       <div className="relative w-16 h-16">
+        {/* Background glow when critical */}
+        {isCritical && (
+          <div className="absolute inset-0 bg-red-500/20 rounded-full animate-pulse" />
+        )}
+        
         <svg className="w-16 h-16 transform -rotate-90">
           <circle
             cx="32"
@@ -58,17 +64,28 @@ export default function Timer({
             strokeDasharray={176}
             strokeDashoffset={176 - (percentage / 100) * 176}
             className={`transition-all duration-1000 ${
-              isWarning ? "text-red-500" : "text-emerald-400"
+              isCritical 
+                ? "text-red-500" 
+                : isWarning 
+                  ? "text-amber-500" 
+                  : "text-cyan-400"
             }`}
           />
         </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span
             className={`font-mono font-bold text-lg ${
-              isWarning ? "text-red-500 animate-pulse" : "text-slate-200"
+              isCritical 
+                ? "text-red-500 animate-pulse" 
+                : isWarning 
+                  ? "text-amber-500" 
+                  : "text-slate-200"
             }`}
           >
             {timeRemaining}
+          </span>
+          <span className="text-[8px] text-slate-500">
+            {isCritical ? "⚡" : isWarning ? "🌧️" : "☁️"}
           </span>
         </div>
       </div>

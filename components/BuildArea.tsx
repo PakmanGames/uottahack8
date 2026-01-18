@@ -41,12 +41,20 @@ export default function BuildArea({
   );
 
   return (
-    <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700 rounded-2xl p-4 shadow-xl flex-1">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">
-          Build Area
+    <div className="cloud-card rounded-2xl p-4 shadow-xl flex-1 relative overflow-hidden">
+      {/* Background cloud pattern */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -bottom-4 -right-4 text-8xl opacity-5">☁️</div>
+        <div className="absolute top-10 -left-4 text-6xl opacity-5">🌧️</div>
+      </div>
+      
+      <div className="flex items-center justify-between mb-3 relative z-10">
+        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <span>☁️</span>
+          Cloud Formation
         </h3>
-        <span className="text-emerald-400 text-sm font-mono">
+        <span className="text-emerald-400 text-sm font-mono flex items-center gap-1">
+          <span>💵</span>
           ${totalCost}/mo
         </span>
       </div>
@@ -56,18 +64,19 @@ export default function BuildArea({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`min-h-[200px] rounded-xl border-2 border-dashed p-4 transition-all ${
+        className={`min-h-[200px] rounded-xl border-2 border-dashed p-4 transition-all relative ${
           isDragOver
-            ? "border-cyan-400 bg-cyan-500/10"
+            ? "border-cyan-400 bg-cyan-500/10 shadow-lg shadow-cyan-500/20"
             : "border-slate-600 bg-slate-900/40"
         }`}
       >
         {placedComponents.length === 0 ? (
           <div className="h-full flex items-center justify-center text-slate-500 text-center">
             <div>
-              <p className="text-3xl mb-2">📦</p>
-              <p>Drag components here</p>
-              <p className="text-xs mt-1">or click components to add</p>
+              <p className="text-5xl mb-3 opacity-50">☁️</p>
+              <p className="text-lg">Drop cloud components here</p>
+              <p className="text-xs mt-2 text-slate-600">or click components to add</p>
+              <p className="text-xs mt-4 text-cyan-500/50">Build your infrastructure</p>
             </div>
           </div>
         ) : (
@@ -76,13 +85,13 @@ export default function BuildArea({
               <div
                 key={placed.instanceId}
                 onClick={() => onRemove(placed.instanceId)}
-                className="group relative flex items-center gap-2 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 cursor-pointer hover:border-red-500/50 hover:bg-red-500/10 transition-all"
+                className="group relative flex items-center gap-2 bg-gradient-to-r from-slate-800 to-slate-700 border border-cyan-500/30 rounded-lg px-3 py-2 cursor-pointer hover:border-red-500/50 hover:bg-red-500/10 transition-all shadow-sm hover:shadow-red-500/20"
               >
-                <span className="text-xl">{placed.component.icon}</span>
+                <span className="text-xl group-hover:scale-110 transition-transform">{placed.component.icon}</span>
                 <span className="text-slate-300 text-sm">
                   {placed.component.name}
                 </span>
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                   ×
                 </span>
               </div>
@@ -92,8 +101,9 @@ export default function BuildArea({
       </div>
 
       {placedComponents.length > 0 && (
-        <p className="text-slate-500 text-xs mt-2 text-center">
-          Click a component to remove it
+        <p className="text-slate-500 text-xs mt-2 text-center flex items-center justify-center gap-1">
+          <span>🌬️</span>
+          Click a cloud to remove it
         </p>
       )}
     </div>

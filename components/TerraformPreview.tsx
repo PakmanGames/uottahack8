@@ -16,6 +16,7 @@ export default function TerraformPreview({
   excludedCount = 0,
 }: TerraformPreviewProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Basic syntax highlighting
   const highlightCode = (code: string) => {
@@ -49,7 +50,7 @@ export default function TerraformPreview({
           .replace(/\b(\d+)\b/g, '<span class="text-orange-400">$1</span>');
 
         return (
-          <div key={idx} className="hover:bg-slate-700/30">
+          <div key={idx} className="hover:bg-cyan-500/5">
             <span className="text-slate-600 select-none w-8 inline-block text-right mr-4">
               {idx + 1}
             </span>
@@ -59,20 +60,29 @@ export default function TerraformPreview({
       });
   };
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const displayLines = isExpanded ? code : code.split("\n").slice(0, 15).join("\n");
   const hasMore = code.split("\n").length > 15;
 
   return (
-    <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-xl overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-700 bg-slate-900/50">
+    <div className="cloud-card rounded-2xl shadow-xl overflow-hidden relative">
+      {/* Background decoration */}
+      <div className="absolute bottom-0 right-0 text-8xl opacity-5 pointer-events-none">📄</div>
+      
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/50 bg-slate-900/50 relative z-10">
         <div className="flex items-center gap-2">
-          <span className="text-amber-400">📄</span>
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">
-            Terraform Preview
+          <span className="text-cyan-400">☁️</span>
+          <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+            Infrastructure Code
           </h3>
           {demoMode && excludedCount > 0 && (
-            <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full">
-              {excludedCount} excluded
+            <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 flex items-center gap-1">
+              <span>⚡</span> {excludedCount} filtered
             </span>
           )}
         </div>
@@ -80,10 +90,11 @@ export default function TerraformPreview({
           {/* Demo Mode Toggle */}
           <label className="flex items-center gap-2 cursor-pointer group">
             <span
-              className={`text-xs transition-colors ${
+              className={`text-xs transition-colors flex items-center gap-1 ${
                 demoMode ? "text-emerald-400" : "text-slate-500"
               }`}
             >
+              <span>🌧️</span>
               Demo Mode
             </span>
             <div className="relative">
@@ -95,7 +106,7 @@ export default function TerraformPreview({
               />
               <div
                 className={`w-9 h-5 rounded-full transition-colors ${
-                  demoMode ? "bg-emerald-500" : "bg-slate-600"
+                  demoMode ? "bg-gradient-to-r from-emerald-500 to-cyan-500" : "bg-slate-600"
                 }`}
               />
               <div
@@ -109,10 +120,18 @@ export default function TerraformPreview({
           <div className="w-px h-4 bg-slate-700" />
           
           <button
-            onClick={() => navigator.clipboard.writeText(code)}
-            className="text-xs text-slate-400 hover:text-cyan-400 transition-colors px-2 py-1 rounded hover:bg-slate-700"
+            onClick={handleCopy}
+            className={`text-xs transition-colors px-2 py-1 rounded flex items-center gap-1 ${
+              copied 
+                ? "text-emerald-400 bg-emerald-500/10" 
+                : "text-slate-400 hover:text-cyan-400 hover:bg-slate-700"
+            }`}
           >
-            📋 Copy
+            {copied ? (
+              <>✓ Copied!</>
+            ) : (
+              <>📋 Copy</>
+            )}
           </button>
           {hasMore && (
             <button
@@ -126,16 +145,27 @@ export default function TerraformPreview({
       </div>
 
       <div
-        className={`p-4 overflow-x-auto font-mono text-xs leading-relaxed ${
+        className={`p-4 overflow-x-auto font-mono text-xs leading-relaxed relative z-10 ${
           isExpanded ? "max-h-[500px] overflow-y-auto" : "max-h-[300px]"
         }`}
       >
         <pre className="text-slate-300">{highlightCode(displayLines)}</pre>
         {!isExpanded && hasMore && (
-          <div className="text-center text-slate-500 mt-2 pt-2 border-t border-slate-700/50">
-            ... {code.split("\n").length - 15} more lines
+          <div className="text-center text-slate-500 mt-2 pt-2 border-t border-slate-700/50 flex items-center justify-center gap-2">
+            <span>☁️</span>
+            {code.split("\n").length - 15} more lines
           </div>
         )}
+      </div>
+      
+      {/* Rain effect hint at bottom */}
+      <div className="px-4 py-2 bg-slate-900/30 border-t border-slate-700/30 flex items-center justify-between text-xs text-slate-500">
+        <span className="flex items-center gap-1">
+          <span>💧</span> Generated Terraform code
+        </span>
+        <span className="flex items-center gap-1">
+          Ready to make it rain <span>🌧️</span>
+        </span>
       </div>
     </div>
   );

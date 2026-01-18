@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Papa's DO-eria - DigitalOcean Infrastructure Game",
+  title: "Rain Maker - Infrastructure as Clouds",
   description:
-    "A Papa's Freezeria-style game where you complete Kubernetes ops tickets!",
+    "Rainy with a chance of rogue tech! A rogue-like game where you build DigitalOcean infrastructure and make it rain with Terraform.",
 };
 
 export default function RootLayout({

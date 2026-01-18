@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0f172a;
+  --background: #0a0f1a;
   --foreground: #e2e8f0;
+  --storm-dark: #0d1117;
+  --storm-medium: #161b22;
+  --storm-light: #21262d;
+  --cloud-blue: #58a6ff;
+  --rain-cyan: #39d4e8;
+  --lightning-yellow: #f0c000;
+  --cash-green: #3fb950;
+  --alert-red: #f85149;
 }
 
 body {
@@ -11,6 +19,7 @@ body {
   font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans",
     "Helvetica Neue", sans-serif;
+  overflow-x: hidden;
 }
 
 /* Custom scrollbar */
@@ -20,25 +29,100 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: var(--storm-dark);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #30363d;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: #484f58;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(251, 191, 36, 0.3);
-  color: #fbbf24;
+  background: rgba(57, 212, 232, 0.3);
+  color: var(--rain-cyan);
 }
 
-/* Animations */
+/* Rain Animation */
+@keyframes rain {
+  0% {
+    transform: translateY(-100vh) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+@keyframes rainDrop {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes lightning {
+  0%, 90%, 100% {
+    opacity: 0;
+  }
+  92%, 94%, 96% {
+    opacity: 0.8;
+  }
+  93%, 95% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes cloudFloat {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(10px) translateY(-5px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(57, 212, 232, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(57, 212, 232, 0.6);
+  }
+}
+
+@keyframes cash-rain {
+  0% {
+    transform: translateY(-50px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -62,10 +146,137 @@ body {
   }
 }
 
+@keyframes stormPulse {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes terminalRain {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(200%);
+    opacity: 0;
+  }
+}
+
 .animate-slide-in {
   animation: slideIn 0.3s ease-out;
 }
 
 .animate-pop {
   animation: pop 0.3s ease-out;
+}
+
+.animate-rain {
+  animation: rain 2s linear infinite;
+}
+
+.animate-cloud-float {
+  animation: cloudFloat 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-lightning {
+  animation: lightning 8s ease-in-out infinite;
+}
+
+.animate-storm-pulse {
+  animation: stormPulse 15s ease infinite;
+  background-size: 200% 200%;
+}
+
+/* Rain drops container */
+.rain-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.rain-drop {
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  background: linear-gradient(to bottom, transparent, var(--rain-cyan));
+  opacity: 0.3;
+  animation: rainDrop 1s linear infinite;
+}
+
+/* Storm background gradient */
+.storm-bg {
+  background: linear-gradient(
+    135deg,
+    #0a0f1a 0%,
+    #0d1526 25%,
+    #111827 50%,
+    #0f172a 75%,
+    #0a0f1a 100%
+  );
+}
+
+/* Neon text glow */
+.neon-text {
+  text-shadow: 
+    0 0 10px currentColor,
+    0 0 20px currentColor,
+    0 0 40px currentColor;
+}
+
+/* Cloud card effect */
+.cloud-card {
+  background: linear-gradient(
+    145deg,
+    rgba(22, 27, 34, 0.9) 0%,
+    rgba(13, 17, 23, 0.95) 100%
+  );
+  border: 1px solid rgba(48, 54, 61, 0.5);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -2px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Lightning flash overlay */
+.lightning-flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  pointer-events: none;
+  animation: lightning 8s ease-in-out infinite;
+  z-index: 100;
+}
+
+/* Terminal code rain effect */
+.terminal-rain {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--rain-cyan);
+  opacity: 0.15;
+  white-space: nowrap;
+  animation: terminalRain 10s linear infinite;
+}
+
+/* Cash "make it rain" effect */
+.cash-particle {
+  position: fixed;
+  font-size: 1.5rem;
+  animation: cash-rain 3s linear forwards;
+  pointer-events: none;
+  z-index: 50;
 }
