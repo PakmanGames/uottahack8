@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import {
   Order,
   PlacedComponent,
@@ -8,7 +8,7 @@ import {
   OrderResult,
   GamePhase,
 } from "@/lib/types";
-import { generateTerraformCode } from "@/lib/terraform-generator";
+import { generateTerraformCodeWithInfo } from "@/lib/terraform-generator";
 import OrderTicket from "@/components/OrderTicket";
 import ComponentPalette from "@/components/ComponentPalette";
 import BuildArea from "@/components/BuildArea";
@@ -34,9 +34,14 @@ export default function Home() {
   const [timeRemaining, setTimeRemaining] = useState(60);
   const [feedback, setFeedback] = useState<OrderResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
 
-  // Generate terraform code
-  const terraformCode = generateTerraformCode(placedComponents, currentOrder);
+  // Generate terraform code with demo mode filtering info
+  const terraformResult = generateTerraformCodeWithInfo(
+    placedComponents,
+    currentOrder,
+    demoMode
+  );
 
   // Fetch new order
   const fetchOrder = useCallback(async () => {
@@ -338,7 +343,12 @@ export default function Home() {
         </div>
 
         {/* Terraform Preview */}
-        <TerraformPreview code={terraformCode} />
+        <TerraformPreview
+          code={terraformResult.code}
+          demoMode={demoMode}
+          onDemoModeChange={setDemoMode}
+          excludedCount={terraformResult.excludedCount}
+        />
       </div>
     </div>
   );
